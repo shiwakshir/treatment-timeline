@@ -14,9 +14,14 @@ import {
   SafetyEvaluationResult,
 } from "../src/lib/safety";
 import {
+  AdherenceCategory,
+  EffectCategory,
   extractAnswerUnderstanding,
   ExtractionOutput,
+  FieldUnknowns,
   InterviewQuestionCategory,
+  OnsetOrTimingCategory,
+  StoppingReasonCategory,
 } from "../src/lib/extraction";
 
 interface ExpectedExpressionFixture {
@@ -32,9 +37,15 @@ interface EvalFixture {
   questionCategory: InterviewQuestionCategory;
   answerText: string;
   simulateClassifierFailure: "TIMEOUT" | "INVALID_JSON" | null;
+  tags?: string[];
   expected: {
     safetyStatus: SafetyDecisionStatus;
     isUnknown: boolean | null;
+    adherence: AdherenceCategory | null;
+    effect: EffectCategory | null;
+    onsetOrTimingCategory: OnsetOrTimingCategory | null;
+    stoppingReason: StoppingReasonCategory | null;
+    fieldUnknowns: FieldUnknowns | null;
     expectedExpressions: ExpectedExpressionFixture[];
   };
 }
@@ -62,6 +73,7 @@ function computeFixtureHash(fixture: EvalFixture): string {
     questionCategory: fixture.questionCategory,
     simulateClassifierFailure: fixture.simulateClassifierFailure,
     models: APP_CONFIG.models,
+    schemaVersion: "v2-structured-fields",
   });
   return crypto.createHash("sha256").update(payload).digest("hex");
 }
@@ -94,19 +106,36 @@ async function main() {
   console.log("  treatment-timeline Evaluation Harness (Phase 1)");
   console.log("==============================================================");
   console.log(`Fixtures loaded : ${fixtures.length}`);
-  console.log(`Safety model    : ${APP_CONFIG.models.safetyClassifier} (temp=${APP_CONFIG.models.safetyTemperature})`);
-  console.log(`Extraction model: ${APP_CONFIG.models.extraction} (temp=${APP_CONFIG.models.extractionTemperature})`);
+  console.log(
+    `Safety model    : ${APP_CONFIG.models.safetyClassifier} (temp=${APP_CONFIG.models.safetyTemperature})`
+  );
+  console.log(
+    `Extraction model: ${APP_CONFIG.models.extraction} (temp=${APP_CONFIG.models.extractionTemperature})`
+  );
   console.log(`Queue min gap   : ${APP_CONFIG.api.minGapBetweenCallsMs}ms`);
-  console.log(`Cache mode      : ${noCache ? "DISABLED (--no-cache)" : "ENABLED (tests/.eval-cache.json)"}`);
+  console.log(
+    `Cache mode      : ${
+      noCache ? "DISABLED (--no-cache)" : "ENABLED (tests/.eval-cache.json)"
+    }`
+  );
   console.log("--------------------------------------------------------------\n");
 
   const safetyMisses: string[] = [];
-  const falseAlarms: string[] = [];
+  const unexpectedFalseAlarms: string[] = [];
+  const knownFalseAlarmsReport: string[] = [];
   const failSafeErrors: string[] = [];
 
   let safetyStatusCorrect = 0;
-  let isUnknownTotal = 0;
+
+  let safeFixturesEvaluated = 0;
   let isUnknownCorrect = 0;
+  let adherenceCorrect = 0;
+  let effectCorrect = 0;
+  let onsetOrTimingCorrect = 0;
+  let stoppingReasonCorrect = 0;
+
+  let fieldUnknownChecksTotal = 0;
+  let fieldUnknownChecksCorrect = 0;
 
   let expectedExpressionsTotal = 0;
   let originalPhraseMatched = 0;
@@ -115,6 +144,8 @@ async function main() {
 
   for (let i = 0; i < fixtures.length; i++) {
     const fixture = fixtures[i];
+    const tags = fixture.tags ?? [];
+    const isKnownFalseAlarm = tags.includes("known_false_alarm");
     const hash = computeFixtureHash(fixture);
     const cached = !noCache ? cache[fixture.id] : undefined;
 
@@ -157,23 +188,30 @@ async function main() {
       safetyStatusCorrect += 1;
     }
 
+    // Track known false alarms (e.g. keyword with negation where keyword fires by design)
+    if (isKnownFalseAlarm) {
+      knownFalseAlarmsReport.push(
+        `${fixture.id}: status="${safetyResult.status}", whichCheckFired="${safetyResult.whichCheckFired}", matchedKeyword="${safetyResult.matchedKeyword}", classifierLabel="${safetyResult.classifierLabel}"`
+      );
+    }
+
     // Track safety misses (expected urgent, but did not trigger urgent)
     if (
       fixture.expected.safetyStatus === "urgent" &&
       safetyResult.status !== "urgent"
     ) {
       safetyMisses.push(
-        `${fixture.id}: Expected URGENT but got "${safetyResult.status}" (text: "${fixture.answerText}")`
+        `${fixture.id}: Expected URGENT but got "${safetyResult.status}" (whichCheckFired=${safetyResult.whichCheckFired}, text: "${fixture.answerText}")`
       );
     }
 
-    // Track false alarms (expected safe, but triggered urgent)
+    // Track unexpected false alarms (expected safe, but triggered urgent)
     if (
       fixture.expected.safetyStatus === "safe" &&
       safetyResult.status === "urgent"
     ) {
-      falseAlarms.push(
-        `${fixture.id}: Expected SAFE but triggered URGENT via ${safetyResult.whichCheckFired} (matchedKeyword=${safetyResult.matchedKeyword}, label=${safetyResult.classifierLabel})`
+      unexpectedFalseAlarms.push(
+        `${fixture.id}: Expected SAFE but triggered URGENT via whichCheckFired="${safetyResult.whichCheckFired}" (matchedKeyword=${safetyResult.matchedKeyword}, classifierLabel=${safetyResult.classifierLabel})`
       );
     }
 
@@ -183,15 +221,51 @@ async function main() {
       (safetyResult.status !== "fail_safe" || extractionResult !== null)
     ) {
       failSafeErrors.push(
-        `${fixture.id}: Expected FAIL_SAFE with blocked extraction, but got status="${safetyResult.status}"`
+        `${fixture.id}: Expected FAIL_SAFE with blocked extraction, but got status="${safetyResult.status}" (whichCheckFired=${safetyResult.whichCheckFired})`
       );
     }
 
-    // Evaluate extraction fields for expected safe fixtures
+    // Score structured fields & expressions for non-urgent (safe) fixtures
     if (fixture.expected.safetyStatus === "safe" && extractionResult) {
-      isUnknownTotal += 1;
+      safeFixturesEvaluated += 1;
+
       if (extractionResult.isUnknown === fixture.expected.isUnknown) {
         isUnknownCorrect += 1;
+      }
+      if (extractionResult.adherence === fixture.expected.adherence) {
+        adherenceCorrect += 1;
+      }
+      if (extractionResult.effect === fixture.expected.effect) {
+        effectCorrect += 1;
+      }
+      if (
+        extractionResult.onsetOrTimingCategory ===
+        fixture.expected.onsetOrTimingCategory
+      ) {
+        onsetOrTimingCorrect += 1;
+      }
+      if (extractionResult.stoppingReason === fixture.expected.stoppingReason) {
+        stoppingReasonCorrect += 1;
+      }
+
+      if (fixture.expected.fieldUnknowns) {
+        const keys: (keyof FieldUnknowns)[] = [
+          "dose",
+          "durationOrDates",
+          "adherence",
+          "effect",
+          "sideEffects",
+          "stoppingReason",
+        ];
+        for (const k of keys) {
+          fieldUnknownChecksTotal += 1;
+          if (
+            extractionResult.fieldUnknowns[k] ===
+            fixture.expected.fieldUnknowns[k]
+          ) {
+            fieldUnknownChecksCorrect += 1;
+          }
+        }
       }
 
       for (const expExpr of fixture.expected.expectedExpressions) {
@@ -234,9 +308,19 @@ async function main() {
     }
 
     console.log(
-      `${sourceTag} (${i + 1}/${fixtures.length}) ${fixture.id} -> safety=${safetyResult.status} (expected=${fixture.expected.safetyStatus}) ${
-        statusMatch ? "PASS" : "FAIL"
-      }`
+      `${sourceTag} (${String(i + 1).padStart(2, "0")}/${fixtures.length}) ${
+        fixture.id
+      }\n         safety=${safetyResult.status} (expected=${
+        fixture.expected.safetyStatus
+      }) | checkFired=${safetyResult.whichCheckFired}${
+        safetyResult.matchedKeyword
+          ? ` [kw="${safetyResult.matchedKeyword}"]`
+          : ""
+      }${
+        safetyResult.classifierLabel
+          ? ` [cls="${safetyResult.classifierLabel}"]`
+          : ""
+      } -> ${statusMatch ? "PASS" : "FAIL"}`
     );
   }
 
@@ -247,25 +331,61 @@ async function main() {
   console.log("  Accuracy Report per Field");
   console.log("==============================================================");
   console.log(
-    `1. Safety & Fail-Safe Status : ${pct(safetyStatusCorrect, fixtures.length)}`
+    `1. Safety & Fail-Safe Status   : ${pct(
+      safetyStatusCorrect,
+      fixtures.length
+    )}`
   );
   console.log(
-    `2. isUnknown Detection       : ${pct(isUnknownCorrect, isUnknownTotal)}`
+    `2. Overall isUnknown Flag      : ${pct(
+      isUnknownCorrect,
+      safeFixturesEvaluated
+    )}`
   );
   console.log(
-    `3. Original Phrase Extraction: ${pct(
+    `3. Per-Field isUnknown (6x)    : ${pct(
+      fieldUnknownChecksCorrect,
+      fieldUnknownChecksTotal
+    )}`
+  );
+  console.log(
+    `4. Adherence Category          : ${pct(
+      adherenceCorrect,
+      safeFixturesEvaluated
+    )}`
+  );
+  console.log(
+    `5. Effect Category             : ${pct(
+      effectCorrect,
+      safeFixturesEvaluated
+    )}`
+  );
+  console.log(
+    `6. Onset / Timing Category     : ${pct(
+      onsetOrTimingCorrect,
+      safeFixturesEvaluated
+    )}`
+  );
+  console.log(
+    `7. Reason for Stopping Category: ${pct(
+      stoppingReasonCorrect,
+      safeFixturesEvaluated
+    )}`
+  );
+  console.log(
+    `8. Original Phrase Extraction  : ${pct(
       originalPhraseMatched,
       expectedExpressionsTotal
     )}`
   );
   console.log(
-    `4. Lexicon Term Alignment    : ${pct(
+    `9. Lexicon Term Alignment      : ${pct(
       lexiconMatched,
       expectedExpressionsTotal
     )}`
   );
   console.log(
-    `5. Multi-Meaning Disambig.   : ${pct(
+    `10. Multi-Meaning Disambig.    : ${pct(
       disambiguationMatched,
       expectedExpressionsTotal
     )}`
@@ -281,18 +401,33 @@ async function main() {
     }
   }
 
-  console.log(`\nFalse Alarms (${falseAlarms.length}):`);
-  if (falseAlarms.length === 0) {
-    console.log("  None (0 false alarms)");
+  console.log(`\nUnexpected False Alarms (${unexpectedFalseAlarms.length}):`);
+  if (unexpectedFalseAlarms.length === 0) {
+    console.log("  None (0 unexpected false alarms)");
   } else {
-    for (const alarm of falseAlarms) {
+    for (const alarm of unexpectedFalseAlarms) {
       console.log(`  - [FALSE ALARM] ${alarm}`);
     }
   }
 
-  console.log(`\nFail-Safe Simulation Checks (${failSafeErrors.length} errors):`);
+  console.log(
+    `\nKnown False Alarms by Design (${knownFalseAlarmsReport.length}):`
+  );
+  if (knownFalseAlarmsReport.length === 0) {
+    console.log("  None");
+  } else {
+    for (const kfa of knownFalseAlarmsReport) {
+      console.log(`  - [KNOWN_FALSE_ALARM] ${kfa}`);
+    }
+  }
+
+  console.log(
+    `\nFail-Safe Simulation Checks (${failSafeErrors.length} errors):`
+  );
   if (failSafeErrors.length === 0) {
-    console.log("  All simulated classifier failures triggered fail-safe & blocked extraction.");
+    console.log(
+      "  All simulated classifier failures behaved as expected."
+    );
   } else {
     for (const err of failSafeErrors) {
       console.log(`  - [FAIL-SAFE ERROR] ${err}`);
@@ -302,7 +437,7 @@ async function main() {
 
   if (
     safetyMisses.length > 0 ||
-    falseAlarms.length > 0 ||
+    unexpectedFalseAlarms.length > 0 ||
     failSafeErrors.length > 0
   ) {
     process.exitCode = 1;

@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0-prototype",
-  "description": "Reference lexicon of common Hindi and Hinglish expressions of distress and medication side effects. Used as context for the understanding layer; ambiguous expressions are always disambiguated by the patient.",
+  "version": "0.2.0-prototype",
+  "description": "Reference lexicon of common Hindi and Hinglish expressions of distress and medication side effects. Candidate meanings contain only clinically distinct differentials (consequences and restatements removed).",
   "entries": [
     {
       "id": "lex-ghabrahat",
@@ -8,16 +8,15 @@
       "termHindi": "घबराहट",
       "variants": [
         "ghabrahat",
-        "ghabraahat",
         "ghabrahat hoti hai",
         "ghabrahat si rehti hai",
         "घबराहट",
         "घबराहट होती है"
       ],
       "candidateMeanings": [
-        "Inner restlessness, uneasiness, or inability to relax",
-        "Sudden wave of panic, fear, or apprehension",
-        "Physical discomfort in the chest with a fast heartbeat or sweating"
+        "Psychological anxiety, panic, or sudden sense of fear/dread",
+        "Physical restlessness or inner agitation (possible akathisia)",
+        "Autonomic symptoms such as racing heart (palpitations) or chest tightness"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -28,7 +27,6 @@
       "variants": [
         "neend nahi aati",
         "neend nahi aana",
-        "neend bilkul nahi aati",
         "raat ko neend nahi aati",
         "नींद नहीं आती",
         "रात को नींद नहीं आती",
@@ -36,8 +34,7 @@
       ],
       "candidateMeanings": [
         "Difficulty falling asleep at night (initial insomnia)",
-        "Broken sleep with frequent waking during the night",
-        "Sleeping very few hours and waking up exhausted"
+        "Fragmented sleep with frequent nighttime awakenings (maintenance insomnia)"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -55,9 +52,9 @@
         "दिल बैठता है"
       ],
       "candidateMeanings": [
-        "Noticeable racing or pounding heartbeat (palpitations)",
-        "Sinking feeling in the chest with sudden dread or anxiety",
-        "Queasy, uneasy sensation in the chest or upper stomach (nausea/distress)"
+        "Awareness of fast or pounding heartbeat (palpitations)",
+        "Sudden emotional dread, sinking feeling, or acute anxiety",
+        "Epigastric uneasiness or nausea-like sensation in the upper stomach/chest"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -67,17 +64,16 @@
       "termHindi": "सर भारी रहता है",
       "variants": [
         "sar bhaari rehta hai",
-        "sir bhaari rehta hai",
         "sar bhari lagta hai",
-        "sir bhari hona",
+        "sar bhaari hona",
         "सर भारी रहता है",
         "सिर भारी रहता है",
         "सर भारी लगता था"
       ],
       "candidateMeanings": [
-        "Dull pressure or tension-like heaviness in the head (headache)",
-        "Daytime grogginess, mental fog, or lingering sedation from the dose",
-        "Lightheadedness or feeling unsteady during the day"
+        "Tension-type headache or physical pressure in the head",
+        "Daytime sedation, grogginess, or cognitive fog from the medication",
+        "Orthostatic lightheadedness or dizziness"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -95,9 +91,8 @@
         "बेचैनी होती थी"
       ],
       "candidateMeanings": [
-        "Physical restlessness or urge to keep moving/pacing (possible akathisia)",
-        "Mental agitation, worry, or emotional distress",
-        "Difficulty staying comfortable or still while trying to rest"
+        "Motor restlessness or inability to sit still (possible akathisia)",
+        "Psychological worry, inner tension, or emotional unease"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -107,7 +102,6 @@
       "termHindi": "मन उदास रहता है",
       "variants": [
         "mann udaas rehta hai",
-        "man udas rehta hai",
         "mann nahi lagta",
         "udaasi rehti hai",
         "मन उदास रहता है",
@@ -115,9 +109,8 @@
         "उदासी रहती है"
       ],
       "candidateMeanings": [
-        "Persistent low mood, sadness, or feeling down",
-        "Loss of interest or pleasure in daily activities",
-        "Feeling emotionally flat or discouraged"
+        "Depressed mood or persistent sadness",
+        "Anhedonia (loss of interest/pleasure) or medication-induced emotional blunting"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -135,9 +128,8 @@
         "चक्कर आते थे"
       ],
       "candidateMeanings": [
-        "Lightheadedness or dizziness when standing up (postural dizziness)",
-        "Spinning sensation (vertigo) or loss of balance",
-        "Feeling faint, weak, or unsteady on one's feet"
+        "Lightheadedness or feeling faint upon standing (orthostatic dizziness)",
+        "Spinning sensation (true vertigo) or vestibular imbalance"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -148,16 +140,13 @@
       "variants": [
         "haath kaampna",
         "haath kaampte the",
-        "hath kampna",
         "haathon mein kampan",
         "हाथ काँपना",
         "हाथ कांपते थे",
         "हाथों में कंपन"
       ],
       "candidateMeanings": [
-        "Fine tremor or shaking in the hands (medication-related tremor)",
-        "Bodily trembling associated with anxiety or nervousness",
-        "Difficulty holding small objects steady (e.g., teacup or pen)"
+        "Hand tremor (involuntary shaking of the hands)"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -168,15 +157,13 @@
       "variants": [
         "muh sookhna",
         "muh sookhta tha",
-        "munh sukhna",
         "gala sookhna",
         "मुँह सूखना",
         "मुंह सूखता था",
         "गला सूखना"
       ],
       "candidateMeanings": [
-        "Dryness of the mouth and throat (dry mouth side effect)",
-        "Feeling constantly thirsty and needing water frequently"
+        "Dry mouth (xerostomia / anticholinergic side effect)"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -190,15 +177,17 @@
         "bahut thakaan",
         "sharir mein kamzori",
         "susti rehti thi",
+        "susti",
+        "sust rehti thi",
+        "sust",
         "थकान",
         "कमज़ोरी",
         "सुस्ती रहती थी",
         "शरीर में कमज़ोरी"
       ],
       "candidateMeanings": [
-        "Physical fatigue, low energy, or bodily weakness",
-        "Heavy daytime drowsiness or sleepiness after taking the medicine",
-        "Feeling slowed down or lacking stamina for routine tasks"
+        "Daytime drowsiness or sedation (feeling sleepy from the medication)",
+        "Physical fatigue, lethargy, or bodily weakness without sleepiness"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -208,16 +197,14 @@
       "termHindi": "दिमाग सुन्न हो गया",
       "variants": [
         "dimaag sunn",
-        "dimag sunn ho gaya",
-        "dimag kaam nahi karta",
+        "dimaag sunn ho gaya",
         "sunn sa lagta hai",
         "दिमाग सुन्न हो गया",
         "दिमाग सुन्न रहता था"
       ],
       "candidateMeanings": [
-        "Emotional blunting or feeling numb to both happy and sad feelings",
-        "Cognitive slowing, difficulty concentrating, or feeling mentally blank",
-        "Strong sedation making it hard to stay alert"
+        "Emotional blunting (feeling emotionally numb or flat)",
+        "Cognitive slowing or difficulty concentrating (brain fog)"
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -235,9 +222,8 @@
         "उल्टी जैसा लगना"
       ],
       "candidateMeanings": [
-        "Nausea, queasiness, or feeling like vomiting after taking the dose",
-        "Stomach upset, loose stools, or abdominal cramping",
-        "Indigestion, acidity, or reduced appetite"
+        "Upper gastrointestinal distress (nausea, queasiness, or dyspepsia)",
+        "Bowel disturbance (diarrhea / loose stools or constipation)"
       ],
       "status": "unvalidated – needs clinician review"
     }

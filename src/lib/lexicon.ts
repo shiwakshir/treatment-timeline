@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { normalise } from "@/lib/safety";
 
 export interface LexiconEntry {
   id: string;
@@ -19,8 +20,7 @@ export interface LexiconFile {
 let cachedLexicon: LexiconFile | null = null;
 
 /**
- * Loads data/lexicon.json from disk and verifies that every entry is marked
- * "unvalidated – needs clinician review".
+ * Loads data/lexicon.json from disk.
  */
 export function loadLexicon(): LexiconFile {
   if (cachedLexicon) {
@@ -35,24 +35,16 @@ export function loadLexicon(): LexiconFile {
   return parsed;
 }
 
-function normalizeForMatch(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[.,!?;:'"()[\]{}\-_/\\]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 /**
  * Finds all lexicon entries whose Hindi, Hinglish, or variant forms appear
- * in the user's answer text.
+ * in the user's answer text after running `normalise()`.
  */
 export function findMatchingLexiconEntries(answerText: string): {
   entry: LexiconEntry;
   matchedSubstring: string;
 }[] {
   const lexicon = loadLexicon();
-  const normalizedAnswer = normalizeForMatch(answerText);
+  const paddedNormAnswer = ` ${normalise(answerText)} `;
   const matches: { entry: LexiconEntry; matchedSubstring: string }[] = [];
 
   for (const entry of lexicon.entries) {
@@ -66,8 +58,8 @@ export function findMatchingLexiconEntries(answerText: string): {
     const sortedCandidates = [...candidates].sort((a, b) => b.length - a.length);
 
     for (const candidate of sortedCandidates) {
-      const normCandidate = normalizeForMatch(candidate);
-      if (normCandidate && normalizedAnswer.includes(normCandidate)) {
+      const normCandidate = normalise(candidate);
+      if (normCandidate && paddedNormAnswer.includes(` ${normCandidate} `)) {
         matches.push({
           entry,
           matchedSubstring: candidate,

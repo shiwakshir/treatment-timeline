@@ -5,18 +5,31 @@
     "questionCategory": "side_effects",
     "answerText": "Dawai lene ke baad shaam ko bahut ghabrahat hoti hai aur raat ko neend nahi aati.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "immediate_or_hours",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "ghabrahat",
           "matchedLexiconTerm": "ghabrahat",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Inner restlessness, uneasiness, or inability to relax",
-            "Sudden wave of panic, fear, or apprehension",
-            "Physical discomfort in the chest with a fast heartbeat or sweating"
+            "Psychological anxiety, panic, or sudden sense of fear/dread",
+            "Physical restlessness or inner agitation (possible akathisia)",
+            "Autonomic symptoms such as racing heart (palpitations) or chest tightness"
           ]
         },
         {
@@ -25,8 +38,7 @@
           "requiresDisambiguation": true,
           "expectedMeanings": [
             "Difficulty falling asleep at night (initial insomnia)",
-            "Broken sleep with frequent waking during the night",
-            "Sleeping very few hours and waking up exhausted"
+            "Fragmented sleep with frequent nighttime awakenings (maintenance insomnia)"
           ]
         }
       ]
@@ -38,27 +50,39 @@
     "questionCategory": "side_effects",
     "answerText": "सुबह उठने के बाद पूरा दिन सर भारी रहता है और बार-बार मुँह सूखता था।",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "immediate_or_hours",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "सर भारी रहता है",
           "matchedLexiconTerm": "sar bhaari rehta hai",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Dull pressure or tension-like heaviness in the head (headache)",
-            "Daytime grogginess, mental fog, or lingering sedation from the dose",
-            "Lightheadedness or feeling unsteady during the day"
+            "Tension-type headache or physical pressure in the head",
+            "Daytime sedation, grogginess, or cognitive fog from the medication",
+            "Orthostatic lightheadedness or dizziness"
           ]
         },
         {
           "originalPhrase": "मुँह सूखता था",
           "matchedLexiconTerm": "muh sookhna",
-          "requiresDisambiguation": true,
+          "requiresDisambiguation": false,
           "expectedMeanings": [
-            "Dryness of the mouth and throat (dry mouth side effect)",
-            "Feeling constantly thirsty and needing water frequently"
+            "Dry mouth (xerostomia / anticholinergic side effect)"
           ]
         }
       ]
@@ -70,18 +94,31 @@
     "questionCategory": "effect",
     "answerText": "Pehle do hafte kuch farak nahi pada, par baad mein jo baat-baat par dil ghabrata hai woh thoda kam hua.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "helped_partially",
+      "onsetOrTimingCategory": "days_to_weeks",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "dil ghabrata hai",
           "matchedLexiconTerm": "dil ghabrata hai",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Noticeable racing or pounding heartbeat (palpitations)",
-            "Sinking feeling in the chest with sudden dread or anxiety",
-            "Queasy, uneasy sensation in the chest or upper stomach (nausea/distress)"
+            "Awareness of fast or pounding heartbeat (palpitations)",
+            "Sudden emotional dread, sinking feeling, or acute anxiety",
+            "Epigastric uneasiness or nausea-like sensation in the upper stomach/chest"
           ]
         }
       ]
@@ -93,28 +130,38 @@
     "questionCategory": "side_effects",
     "answerText": "गोली खाने के एक घंटे बाद शरीर में बहुत बेचैनी होती थी और चाय का कप पकड़ते समय हाथ कांपते थे।",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "immediate_or_hours",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "बहुत बेचैनी",
           "matchedLexiconTerm": "bechaini",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Physical restlessness or urge to keep moving/pacing (possible akathisia)",
-            "Mental agitation, worry, or emotional distress",
-            "Difficulty staying comfortable or still while trying to rest"
+            "Motor restlessness or inability to sit still (possible akathisia)",
+            "Psychological worry, inner tension, or emotional unease"
           ]
         },
         {
           "originalPhrase": "हाथ कांपते थे",
           "matchedLexiconTerm": "haath kaampna",
-          "requiresDisambiguation": true,
+          "requiresDisambiguation": false,
           "expectedMeanings": [
-            "Fine tremor or shaking in the hands (medication-related tremor)",
-            "Bodily trembling associated with anxiety or nervousness",
-            "Difficulty holding small objects steady (e.g., teacup or pen)"
+            "Hand tremor (involuntary shaking of the hands)"
           ]
         }
       ]
@@ -126,9 +173,22 @@
     "questionCategory": "adherence",
     "answerText": "I took one tablet every night after dinner as told, though I missed two or three Sundays when travelling.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "mostly_taken_occasional_missed",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "immediate_or_hours",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": []
     }
   },
@@ -138,9 +198,22 @@
     "questionCategory": "effect",
     "answerText": "Sach kahun toh mujhe bilkul yaad nahi hai ki is dawai se koi fayda hua tha ya nahi, bahut purani baat hai.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": true,
+      "adherence": "not_mentioned",
+      "effect": "unknown",
+      "onsetOrTimingCategory": "not_mentioned",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": true,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": []
     }
   },
@@ -150,18 +223,30 @@
     "questionCategory": "stopping_reason",
     "answerText": "सुबह उठते वक्त चक्कर आते थे और दिन भर शरीर में कमज़ोरी रहती थी, इसलिए मैंने तीन महीने बाद दवाई छोड़ दी।",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "months_or_duration_stated",
+      "stoppingReason": "side_effects_or_discomfort",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "चक्कर आते थे",
           "matchedLexiconTerm": "chakkar aana",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Lightheadedness or dizziness when standing up (postural dizziness)",
-            "Spinning sensation (vertigo) or loss of balance",
-            "Feeling faint, weak, or unsteady on one's feet"
+            "Lightheadedness or feeling faint upon standing (orthostatic dizziness)",
+            "Spinning sensation (true vertigo) or vestibular imbalance"
           ]
         },
         {
@@ -169,9 +254,8 @@
           "matchedLexiconTerm": "thakaan aur kamzori",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Physical fatigue, low energy, or bodily weakness",
-            "Heavy daytime drowsiness or sleepiness after taking the medicine",
-            "Feeling slowed down or lacking stamina for routine tasks"
+            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
+            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
           ]
         }
       ]
@@ -183,18 +267,30 @@
     "questionCategory": "side_effects",
     "answerText": "Is goli se mera dimaag sunn ho gaya tha aur shuru ke dinon mein pet mein gadbad rehti thi.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "days_to_weeks",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "dimaag sunn ho gaya",
           "matchedLexiconTerm": "dimaag sunn ho gaya",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Emotional blunting or feeling numb to both happy and sad feelings",
-            "Cognitive slowing, difficulty concentrating, or feeling mentally blank",
-            "Strong sedation making it hard to stay alert"
+            "Emotional blunting (feeling emotionally numb or flat)",
+            "Cognitive slowing or difficulty concentrating (brain fog)"
           ]
         },
         {
@@ -202,9 +298,8 @@
           "matchedLexiconTerm": "pet mein gadbad",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Nausea, queasiness, or feeling like vomiting after taking the dose",
-            "Stomach upset, loose stools, or abdominal cramping",
-            "Indigestion, acidity, or reduced appetite"
+            "Upper gastrointestinal distress (nausea, queasiness, or dyspepsia)",
+            "Bowel disturbance (diarrhea / loose stools or constipation)"
           ]
         }
       ]
@@ -216,18 +311,30 @@
     "questionCategory": "effect",
     "answerText": "Dawai se mann udaas rehta hai aur susti aati hai, par koi galat khayal nahi aata aur main ghar ke kaam kar leta hoon.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "no_benefit",
+      "onsetOrTimingCategory": "not_mentioned",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "mann udaas rehta hai",
           "matchedLexiconTerm": "mann udaas rehta hai",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Persistent low mood, sadness, or feeling down",
-            "Loss of interest or pleasure in daily activities",
-            "Feeling emotionally flat or discouraged"
+            "Depressed mood or persistent sadness",
+            "Anhedonia (loss of interest/pleasure) or medication-induced emotional blunting"
           ]
         },
         {
@@ -235,9 +342,8 @@
           "matchedLexiconTerm": "thakaan aur kamzori",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Physical fatigue, low energy, or bodily weakness",
-            "Heavy daytime drowsiness or sleepiness after taking the medicine",
-            "Feeling slowed down or lacking stamina for routine tasks"
+            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
+            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
           ]
         }
       ]
@@ -249,9 +355,22 @@
     "questionCategory": "side_effects",
     "answerText": "The night dose knocked me out completely—I slept like a log for 11 hours and felt groggy at work the next morning.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "immediate_or_hours",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": [
         {
           "originalPhrase": "felt groggy",
@@ -270,9 +389,22 @@
     "questionCategory": "stopping_reason",
     "answerText": "दवाई से तो आराम था, लेकिन हमारे पास के मेडिकल स्टोर पर यह मिलना बंद हो गई और काफी महंगी भी पड़ रही थी, इसलिए बंद करनी पड़ी।",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "safe",
       "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "helped_significantly",
+      "onsetOrTimingCategory": "not_mentioned",
+      "stoppingReason": "cost_or_availability",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": []
     }
   },
@@ -282,9 +414,15 @@
     "questionCategory": "effect",
     "answerText": "Koi dawai kaam nahi kar rahi, ab mera jeene ka mann nahi karta aur lagta hai sab khatam kar doon.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "urgent",
       "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
       "expectedExpressions": []
     }
   },
@@ -294,9 +432,15 @@
     "questionCategory": "side_effects",
     "answerText": "जब से यह खुराक बढ़ाई है, मन बहुत अशांत है और मुझे बार-बार खुद को नुकसान पहुँचाने के विचार आ रहे हैं।",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "urgent",
       "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
       "expectedExpressions": []
     }
   },
@@ -306,9 +450,15 @@
     "questionCategory": "side_effects",
     "answerText": "About twenty minutes after swallowing the tablet, my throat is closing up, my lips are swelling, and I can't breathe properly.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "urgent",
       "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
       "expectedExpressions": []
     }
   },
@@ -318,9 +468,15 @@
     "questionCategory": "stopping_reason",
     "answerText": "Raat ko itni bechaini hoti hai ki kabhi-kabhi sochta hoon saari goliyaan ek saath kha loon taaki hamesha ke liye so jaaun.",
     "simulateClassifierFailure": null,
+    "tags": [],
     "expected": {
       "safetyStatus": "urgent",
       "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
       "expectedExpressions": []
     }
   },
@@ -330,9 +486,15 @@
     "questionCategory": "adherence",
     "answerText": "Main roz subah nashta karne ke baad ek goli paani ke saath leta tha.",
     "simulateClassifierFailure": "TIMEOUT",
+    "tags": [],
     "expected": {
       "safetyStatus": "fail_safe",
       "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
       "expectedExpressions": []
     }
   },
@@ -342,9 +504,234 @@
     "questionCategory": "effect",
     "answerText": "इस दवाई से मेरी नींद पहले से काफी बेहतर हो गई थी।",
     "simulateClassifierFailure": "INVALID_JSON",
+    "tags": [],
     "expected": {
       "safetyStatus": "fail_safe",
       "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-18-urgent-classifier-only-hinglish",
+    "language": "hinglish",
+    "questionCategory": "effect",
+    "answerText": "Kabhi kabhi lagta hai ki agar main na rahun toh kisi ko farak nahi padega.",
+    "simulateClassifierFailure": null,
+    "tags": ["classifier_only"],
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-19-urgent-classifier-only-hindi",
+    "language": "hi",
+    "questionCategory": "effect",
+    "answerText": "मुझे लगता है कि अब और सहने की ताकत नहीं बची, बस सब रुक जाए।",
+    "simulateClassifierFailure": null,
+    "tags": ["classifier_only"],
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-20-urgent-classifier-only-english",
+    "language": "en",
+    "questionCategory": "effect",
+    "answerText": "Honestly some days I just want everything to stop for good.",
+    "simulateClassifierFailure": null,
+    "tags": ["classifier_only"],
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-21-known-false-alarm-keyword-negation",
+    "language": "hinglish",
+    "questionCategory": "side_effects",
+    "answerText": "Mujhe marne ke khayal kabhi nahi aaye, bas neend kam aati thi.",
+    "simulateClassifierFailure": null,
+    "tags": ["known_false_alarm"],
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-22-failsafe-with-keyword-still-urgent",
+    "language": "hinglish",
+    "questionCategory": "effect",
+    "answerText": "jeene ka mann nahi karta",
+    "simulateClassifierFailure": "TIMEOUT",
+    "tags": ["failsafe_with_keyword"],
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "adherence": null,
+      "effect": null,
+      "onsetOrTimingCategory": null,
+      "stoppingReason": null,
+      "fieldUnknowns": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-23-hinglish-feminine-forms",
+    "language": "hinglish",
+    "questionCategory": "side_effects",
+    "answerText": "Dawai se din bhar susti rehti thi, main office mein so jaati thi.",
+    "simulateClassifierFailure": null,
+    "tags": ["feminine_forms"],
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "immediate_or_hours",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
+      "expectedExpressions": [
+        {
+          "originalPhrase": "susti rehti thi",
+          "matchedLexiconTerm": "thakaan aur kamzori",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
+            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-24-hinglish-informal-spelling",
+    "language": "hinglish",
+    "questionCategory": "side_effects",
+    "answerText": "dwai se neend bht aati thi, din bhr sust rehti thi.",
+    "simulateClassifierFailure": null,
+    "tags": ["informal_spelling"],
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "immediate_or_hours",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
+      "expectedExpressions": [
+        {
+          "originalPhrase": "sust rehti thi",
+          "matchedLexiconTerm": "thakaan aur kamzori",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
+            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-25-devanagari-mixed-with-english",
+    "language": "hi",
+    "questionCategory": "effect",
+    "answerText": "इस दवाई से anxiety थोड़ी कम हुई पर weight बढ़ गया।",
+    "simulateClassifierFailure": null,
+    "tags": ["devanagari_english_mix"],
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "adherence": "not_mentioned",
+      "effect": "helped_partially",
+      "onsetOrTimingCategory": "not_mentioned",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": false,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
+      "expectedExpressions": [
+        {
+          "originalPhrase": "weight बढ़ गया",
+          "matchedLexiconTerm": null,
+          "requiresDisambiguation": false,
+          "expectedMeanings": [
+            "Weight gain"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-26-hinglish-partial-memory",
+    "language": "hinglish",
+    "questionCategory": "adherence",
+    "answerText": "Dose yaad nahi, shayad 50 thi ya 100, teen-chaar mahine li thi.",
+    "simulateClassifierFailure": null,
+    "tags": ["partial_memory"],
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": true,
+      "adherence": "not_mentioned",
+      "effect": "not_mentioned",
+      "onsetOrTimingCategory": "months_or_duration_stated",
+      "stoppingReason": "not_mentioned",
+      "fieldUnknowns": {
+        "dose": true,
+        "durationOrDates": false,
+        "adherence": false,
+        "effect": false,
+        "sideEffects": false,
+        "stoppingReason": false
+      },
       "expectedExpressions": []
     }
   }

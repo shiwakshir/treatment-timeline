@@ -7,6 +7,125 @@ import {
 } from "@/lib/request-queue";
 
 /**
+ * Common Hinglish token spelling variant map (applied both before and after
+ * repeated-letter collapsing so variants like nahi/nahin/nhi/nai, mann/man/mn,
+ * saans/sans, jeene/jine, dwai/dawai, bht/bahut, bhr/bhar normalize identically).
+ */
+const HINGLISH_VARIANT_MAP: Record<string, string> = {
+  // Negation variants -> "nahi"
+  nahi: "nahi",
+  nahin: "nahi",
+  nhi: "nahi",
+  nai: "nahi",
+  nahee: "nahi",
+  nhin: "nahi",
+
+  // Mind / desire variants -> "man"
+  mann: "man",
+  man: "man",
+  mn: "man",
+  mannn: "man",
+
+  // Breath variants -> "sans"
+  saans: "sans",
+  sans: "sans",
+  saas: "sans",
+  saansein: "sans",
+
+  // Living variants -> "jine"
+  jeene: "jine",
+  jine: "jine",
+  jeena: "jine",
+  jina: "jine",
+
+  // Harm variants -> "nuksan"
+  nuksan: "nuksan",
+  nuksaan: "nuksan",
+  nuqsan: "nuksan",
+  nuqsaan: "nuksan",
+
+  // First-person subjunctive / auxiliaries
+  doon: "dun",
+  dun: "dun",
+  du: "dun",
+  uthun: "uthun",
+  uthoon: "uthun",
+  uthu: "uthun",
+
+  // Thoughts -> "khayal"
+  khayal: "khayal",
+  khayaal: "khayal",
+  khyal: "khayal",
+
+  // Pills / medicine / common clinical Hinglish tokens
+  goliyaan: "goliyan",
+  goliyan: "goliyan",
+  goliya: "goliyan",
+  golia: "goliyan",
+  dawai: "dawai",
+  dwai: "dawai",
+  dawa: "dawai",
+  dwa: "dawai",
+  bahut: "bahut",
+  bht: "bahut",
+  bhut: "bahut",
+  bohot: "bahut",
+  boht: "bahut",
+  bhar: "bhar",
+  bhr: "bhar",
+  sar: "sar",
+  sir: "sar",
+  muh: "muh",
+  munh: "muh",
+  mooh: "muh",
+  kaampna: "kampna",
+  kampna: "kampna",
+  kaampte: "kampte",
+  kampte: "kampte",
+};
+
+/**
+ * Normalises input text (Hindi Devanagari, Hinglish, or English) before keyword
+ * and lexicon matching:
+ * 1. Lowercases text.
+ * 2. Normalises Devanagari:
+ *    - Decomposes NFD to strip nukta (\u093C) so क़/क, ख़/ख, ग़/ग, ज़/ज, ड़/ड, ढ़/ढ, फ़/फ match equally.
+ *    - Maps chandrabindu (ँ, \u0901) to anusvara (ं, \u0902) so साँस/सांस, गोलियाँ/गोलियां, उठूँ/उठूं, दूँ/दूं match equally.
+ * 3. Strips punctuation (retaining Latin a-z, digits 0-9, and Devanagari \u0900-\u097F).
+ * 4. Maps common Hinglish spelling variants (e.g. nahi/nahin/nhi/nai, mann/man/mn, saans/sans),
+ *    collapses repeated Latin letters (aa->a, ee->e, oo->o, nn->n), and re-applies variant mapping.
+ */
+export function normalise(text: string): string {
+  const deNukta = text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\u093C/g, "")
+    .normalize("NFC")
+    // Treat Devanagari chandrabindu (ँ) and anusvara (ं) as equal
+    .replace(/\u0901/g, "\u0902");
+
+  // Strip punctuation (preserve Latin letters, numbers, Devanagari block, and spaces)
+  const stripped = deNukta
+    .replace(/[^a-z0-9\u0900-\u097F\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!stripped) return "";
+
+  const tokens = stripped.split(" ").map((token) => {
+    // Only apply Latin letter-collapsing and Hinglish variant mapping to ASCII tokens
+    if (/^[a-z0-9]+$/.test(token)) {
+      const firstPass = HINGLISH_VARIANT_MAP[token] ?? token;
+      const collapsed = firstPass.replace(/([a-z])\1+/g, "$1");
+      return HINGLISH_VARIANT_MAP[collapsed] ?? collapsed;
+    }
+    return token;
+  });
+
+  return tokens.join(" ");
+}
+
+/**
  * Safety keyword entry covering English, Hinglish (Roman script), and Hindi (Devanagari).
  */
 export interface SafetyKeywordRule {
@@ -17,10 +136,8 @@ export interface SafetyKeywordRule {
 
 /**
  * Curated safety keyword and phrase list across English, Hinglish, and Hindi (Devanagari).
- * Covers:
- * 1. Thoughts or actions of self-harm, suicide, or intentional overdose.
- * 2. Severe physical reactions requiring urgent medical care (breathing difficulty,
- *    throat swelling/closing, severe chest pain, seizure/collapse, severe rash).
+ * Duplicate entries covered by normalise() (e.g. mann/man, nahi/nhi, saans/sans,
+ * self-harm/self harm, nukta and chandrabindu variants) have been removed.
  */
 export const SAFETY_KEYWORDS: SafetyKeywordRule[] = [
   // --- ENGLISH: Self-harm, suicide, overdose ---
@@ -29,10 +146,14 @@ export const SAFETY_KEYWORDS: SafetyKeywordRule[] = [
   { phrase: "kill myself", language: "en", category: "self_harm_or_suicide" },
   { phrase: "end my life", language: "en", category: "self_harm_or_suicide" },
   { phrase: "ending my life", language: "en", category: "self_harm_or_suicide" },
+  { phrase: "end it all", language: "en", category: "self_harm_or_suicide" },
+  { phrase: "no point carrying on", language: "en", category: "self_harm_or_suicide" },
+  { phrase: "no point living", language: "en", category: "self_harm_or_suicide" },
+  { phrase: "don't want to wake up", language: "en", category: "self_harm_or_suicide" },
+  { phrase: "everyone would be better off without me", language: "en", category: "self_harm_or_suicide" },
   { phrase: "want to die", language: "en", category: "self_harm_or_suicide" },
   { phrase: "better off dead", language: "en", category: "self_harm_or_suicide" },
   { phrase: "self-harm", language: "en", category: "self_harm_or_suicide" },
-  { phrase: "self harm", language: "en", category: "self_harm_or_suicide" },
   { phrase: "hurt myself", language: "en", category: "self_harm_or_suicide" },
   { phrase: "hurting myself", language: "en", category: "self_harm_or_suicide" },
   { phrase: "cut myself", language: "en", category: "self_harm_or_suicide" },
@@ -56,15 +177,18 @@ export const SAFETY_KEYWORDS: SafetyKeywordRule[] = [
 
   // --- HINGLISH (Roman Hindi): Self-harm, suicide, overdose ---
   { phrase: "jeene ka mann nahi", language: "hinglish", category: "self_harm_or_suicide" },
-  { phrase: "jeene ka man nahi", language: "hinglish", category: "self_harm_or_suicide" },
-  { phrase: "jine ka mann nahi", language: "hinglish", category: "self_harm_or_suicide" },
+  { phrase: "jeene ka koi fayda nahi", language: "hinglish", category: "self_harm_or_suicide" },
+  { phrase: "bhagwan mujhe utha le", language: "hinglish", category: "self_harm_or_suicide" },
+  { phrase: "upar wala utha le", language: "hinglish", category: "self_harm_or_suicide" },
+  { phrase: "subah na uthun", language: "hinglish", category: "self_harm_or_suicide" },
+  { phrase: "sab khatam kar doon", language: "hinglish", category: "self_harm_or_suicide" },
+  { phrase: "mere bina sab behtar", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "mar jaana chahta", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "mar jaana chahti", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "mar jaane ka mann", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "marne ka mann", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "marne ke khayal", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "khud ko nuksan", language: "hinglish", category: "self_harm_or_suicide" },
-  { phrase: "khud ko nuksaan", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "apne aap ko nuksan", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "khudkushi", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "aatmahatya", language: "hinglish", category: "self_harm_or_suicide" },
@@ -72,12 +196,10 @@ export const SAFETY_KEYWORDS: SafetyKeywordRule[] = [
   { phrase: "apni jaan de", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "apni jaan lena", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "saari goliyaan ek saath", language: "hinglish", category: "self_harm_or_suicide" },
-  { phrase: "sari goliyan ek sath", language: "hinglish", category: "self_harm_or_suicide" },
   { phrase: "nas kaat", language: "hinglish", category: "self_harm_or_suicide" },
 
   // --- HINGLISH (Roman Hindi): Severe physical reactions ---
   { phrase: "saans nahi aa rahi", language: "hinglish", category: "severe_physical_reaction" },
-  { phrase: "sans nahi aa rahi", language: "hinglish", category: "severe_physical_reaction" },
   { phrase: "saans ruk rahi", language: "hinglish", category: "severe_physical_reaction" },
   { phrase: "gala band ho raha", language: "hinglish", category: "severe_physical_reaction" },
   { phrase: "gale mein sujan", language: "hinglish", category: "severe_physical_reaction" },
@@ -90,6 +212,10 @@ export const SAFETY_KEYWORDS: SafetyKeywordRule[] = [
   { phrase: "आत्महत्या", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "खुदकुशी", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "जीने का मन नहीं", language: "hi", category: "self_harm_or_suicide" },
+  { phrase: "भगवान मुझे उठा ले", language: "hi", category: "self_harm_or_suicide" },
+  { phrase: "सुबह न उठूँ", language: "hi", category: "self_harm_or_suicide" },
+  { phrase: "सब खत्म कर दूँ", language: "hi", category: "self_harm_or_suicide" },
+  { phrase: "मेरे बिना सब बेहतर", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "मरने का मन", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "मर जाने का मन", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "मरने के ख्याल", language: "hi", category: "self_harm_or_suicide" },
@@ -98,19 +224,15 @@ export const SAFETY_KEYWORDS: SafetyKeywordRule[] = [
   { phrase: "अपने आप को नुकसान", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "अपनी जान दे", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "ज़िंदगी खत्म कर", language: "hi", category: "self_harm_or_suicide" },
-  { phrase: "जिंदगी खत्म कर", language: "hi", category: "self_harm_or_suicide" },
-  { phrase: "सारी गोलियां एक साथ", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "सारी गोलियाँ एक साथ", language: "hi", category: "self_harm_or_suicide" },
   { phrase: "नस काट", language: "hi", category: "self_harm_or_suicide" },
 
   // --- HINDI (Devanagari): Severe physical reactions ---
-  { phrase: "सांस नहीं आ रही", language: "hi", category: "severe_physical_reaction" },
   { phrase: "साँस नहीं आ रही", language: "hi", category: "severe_physical_reaction" },
-  { phrase: "सांस रुक रही", language: "hi", category: "severe_physical_reaction" },
+  { phrase: "साँस रुक रही", language: "hi", category: "severe_physical_reaction" },
   { phrase: "गला बंद हो रहा", language: "hi", category: "severe_physical_reaction" },
   { phrase: "गले में सूजन", language: "hi", category: "severe_physical_reaction" },
   { phrase: "सीने में तेज़ दर्द", language: "hi", category: "severe_physical_reaction" },
-  { phrase: "सीने में तेज दर्द", language: "hi", category: "severe_physical_reaction" },
   { phrase: "बेहोश हो गया", language: "hi", category: "severe_physical_reaction" },
   { phrase: "बेहोश हो गई", language: "hi", category: "severe_physical_reaction" },
   { phrase: "दौरा पड़ा", language: "hi", category: "severe_physical_reaction" },
@@ -141,30 +263,34 @@ export type SafetyDecisionStatus = "safe" | "urgent" | "fail_safe";
 
 export interface SafetyEvaluationResult {
   status: SafetyDecisionStatus;
-  whichCheckFired: "none" | "keyword" | "classifier" | "both" | "classifier_failure";
+  whichCheckFired:
+    | "none"
+    | "keyword"
+    | "classifier"
+    | "both"
+    | "classifier_failure";
   matchedKeyword: string | null;
   classifierLabel: string | null;
   failureReason: string | null;
 }
 
-function normalizeForSafetyMatch(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[.,!?;:'"()[\]{}\-_/\\]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 /**
  * Deterministic keyword check across English, Hinglish, and Hindi (Devanagari).
- * Always executes synchronously, even if the Gemini classifier is unavailable.
+ * Runs `normalise()` on both the input text and each keyword rule before matching.
+ * Always executes synchronously, even if the Gemini classifier fails.
  */
 export function checkSafetyKeywords(answerText: string): KeywordCheckResult {
-  const normalized = normalizeForSafetyMatch(answerText);
+  const normalizedInput = normalise(answerText);
+  if (!normalizedInput) {
+    return { matched: false, matchedPhrase: null, category: null };
+  }
+
+  // Pad with spaces so short tokens match on word boundaries while multi-word phrases match cleanly
+  const paddedInput = ` ${normalizedInput} `;
 
   for (const rule of SAFETY_KEYWORDS) {
-    const normPhrase = normalizeForSafetyMatch(rule.phrase);
-    if (normPhrase && normalized.includes(normPhrase)) {
+    const normalizedRule = normalise(rule.phrase);
+    if (normalizedRule && paddedInput.includes(` ${normalizedRule} `)) {
       return {
         matched: true,
         matchedPhrase: rule.phrase,
@@ -208,7 +334,6 @@ export async function runSafetyClassifier(
       }
 
       if (options?.simulateClassifierFailure === "INVALID_JSON") {
-        // Parse malformed JSON through Zod to trigger INVALID_SCHEMA failure
         const brokenPayload = { unexpectedField: "not_valid_schema" };
         const parsed = SafetyClassifierSchema.safeParse(brokenPayload);
         if (!parsed.success) {
@@ -233,11 +358,11 @@ export async function runSafetyClassifier(
 Analyze the patient's statement (written in Hindi, English, or Hinglish).
 
 Determine whether the statement indicates an URGENT crisis:
-1. "self_harm_or_suicide": Any active or passive thoughts of suicide, wanting to die, ending one's life, self-harm, cutting, or taking an overdose / all pills at once.
+1. "self_harm_or_suicide": Any active OR passive thoughts of suicide, wanting to die, wishing not to exist ("agar main na rahun toh kisi ko farak nahi padega"), feeling unable to go on and wanting everything to stop ("ab aur sahne ki taakat nahi bachi, bas sab ruk jaaye", "want everything to stop for good"), wanting not to wake up, ending one's life, self-harm, cutting, or taking an overdose / all pills at once.
 2. "severe_physical_reaction": Any medical emergency or life-threatening physical reaction such as inability to breathe, throat closing/swelling, anaphylaxis, crushing chest pain, seizure, or fainting/collapsing.
-3. "safe": Routine medication side effects (such as tiredness, mild headache/heavy head, dry mouth, insomnia, mild restlessness/ghabrahat without self-harm, stomach upset, missed doses) OR explicit negations where the patient clearly states they have NO thoughts of self-harm and NO dangerous symptoms, OR figurative everyday idioms about sleep/fatigue (e.g., "slept like a log", "bahut gehri neend aayi").
+3. "safe": Routine medication side effects (tiredness, sleepiness/falling asleep at work, headache/heavy head, dry mouth, insomnia, mild restlessness/ghabrahat without self-harm, weight gain, stomach upset, missed doses, cost issues) OR explicit negations where the patient clearly states they have NO thoughts of self-harm or dying ("marne ke khayal kabhi nahi aaye", "koi galat khayal nahi aata") OR figurative everyday idioms about deep sleep ("slept like a log").
 
-Err on the side of safety when genuine self-harm or severe physical emergency is expressed.
+Err on the side of safety when genuine passive or active suicidal ideation or severe physical emergency is expressed.
 
 Return ONLY valid JSON matching this exact structure:
 {
@@ -287,13 +412,6 @@ ${answerText}
 
 /**
  * Evaluates a user answer using BOTH the keyword list and the Gemini safety classifier.
- *
- * Rules:
- * - Keyword check always runs first.
- * - If either keyword check OR classifier fires -> status = "urgent".
- * - If classifier fails after all retries (timeout, error, or invalid schema):
- *   - If keyword check fired -> status = "urgent" (keyword caught it).
- *   - If keyword check did not fire -> status = "fail_safe" (pause interview, do not extract, show help + retry).
  */
 export async function evaluateAnswerSafety(
   answerText: string,
@@ -302,14 +420,13 @@ export async function evaluateAnswerSafety(
     skipDbLog?: boolean;
   }
 ): Promise<SafetyEvaluationResult> {
-  // Step 1: Always run the synchronous keyword check
+  // Step 1: Always run the synchronous keyword check (with normalise())
   const keywordResult = checkSafetyKeywords(answerText);
 
   // Step 2: Run the LLM classifier via the rate-limited queue
   try {
     const llmResult = await runSafetyClassifier(answerText, options);
-    const llmUrgent =
-      llmResult.isUrgent || llmResult.label !== "safe";
+    const llmUrgent = llmResult.isUrgent || llmResult.label !== "safe";
 
     if (keywordResult.matched && llmUrgent) {
       const result: SafetyEvaluationResult = {
