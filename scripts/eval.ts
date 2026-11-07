@@ -9,18 +9,21 @@ dotenv.config();
 
 import { APP_CONFIG } from "../src/config/app-config";
 import {
+  checkSafetyKeywords,
   evaluateAnswerSafety,
   SafetyDecisionStatus,
   SafetyEvaluationResult,
 } from "../src/lib/safety";
 import {
   AdherenceCategory,
+  DurationTaken,
   EffectCategory,
   extractAnswerUnderstanding,
   ExtractionOutput,
-  FieldUnknowns,
+  FieldStates,
   InterviewQuestionCategory,
-  OnsetOrTimingCategory,
+  OnsetAfterStartingCategory,
+  StoppedByCategory,
   StoppingReasonCategory,
 } from "../src/lib/extraction";
 
@@ -40,12 +43,14 @@ interface EvalFixture {
   tags?: string[];
   expected: {
     safetyStatus: SafetyDecisionStatus;
-    isUnknown: boolean | null;
     adherence: AdherenceCategory | null;
     effect: EffectCategory | null;
-    onsetOrTimingCategory: OnsetOrTimingCategory | null;
+    onsetAfterStarting: OnsetAfterStartingCategory | null;
+    durationTaken: DurationTaken | null;
+    scheduleText: string | null;
     stoppingReason: StoppingReasonCategory | null;
-    fieldUnknowns: FieldUnknowns | null;
+    stoppedBy: StoppedByCategory | null;
+    fieldStates: FieldStates | null;
     expectedExpressions: ExpectedExpressionFixture[];
   };
 }
@@ -58,6 +63,7 @@ interface CachedFixtureEvaluation {
 }
 
 type EvalCacheMap = Record<string, CachedFixtureEvaluation>;
+type ConfusionMatrix = Record<string, Record<string, number>>;
 
 const FIXTURES_PATH = path.join(
   process.cwd(),
@@ -73,7 +79,7 @@ function computeFixtureHash(fixture: EvalFixture): string {
     questionCategory: fixture.questionCategory,
     simulateClassifierFailure: fixture.simulateClassifierFailure,
     models: APP_CONFIG.models,
-    schemaVersion: "v2-structured-fields",
+    schemaVersion: "v3-onset-duration-fieldstates-stoppedby",
   });
   return crypto.createHash("sha256").update(payload).digest("hex");
 }
@@ -90,7 +96,91 @@ function loadEvalCache(): EvalCacheMap {
 }
 
 function saveEvalCache(cache: EvalCacheMap): void {
-  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2), "utf-8");
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, JSON.stringify ? 2 : 2), "utf-8");
+}
+
+function recordConfusion(
+  matrix: ConfusionMatrix,
+  expected: string,
+  actual: string
+): void {
+  if (!matrix[expected]) {
+    matrix[expected] = {};
+  }
+  matrix[expected][actual] = (matrix[expected][actual] ?? 0) + 1;
+}
+
+function printConfusionMatrix(title: string, matrix: ConfusionMatrix): void {
+  const labels = Array.from(
+    new Set([
+      ...Object.keys(matrix),
+      ...Object.values(matrix).flatMap((row) => Object.keys(row)),
+    ])
+  );
+  if (labels.length === 0) return;
+
+  console.log(`\n  Confusion Table: ${title} (Rows = Expected, Cols = Predicted)`);
+  const colWidth = Math.max(14, ...labels.map((l) => l.length + 2));
+  const pad = (s: string) => s.padEnd(colWidth, " ");
+
+  const header = `    ${pad("Expected \\ Pred")} | ${labels.map(pad).join(" | ")}`;
+  console.log(header);
+  console.log(`    ${"-".repeat(header.length - 4)}`);
+
+  for (const exp of labels) {
+    const rowCells = labels.map((pred) =>
+      pad(String(matrix[exp]?.[pred] ?? 0))
+    );
+    console.log(`    ${pad(exp)} | ${rowCells.join(" | ")}`);
+  }
+}
+
+interface DualFieldCounter {
+  allTotal: number;
+  allCorrect: number;
+  statedTotal: number;
+  statedCorrect: number;
+  confusion: ConfusionMatrix;
+}
+
+function createCounter(): DualFieldCounter {
+  return {
+    allTotal: 0,
+    allCorrect: 0,
+    statedTotal: 0,
+    statedCorrect: 0,
+    confusion: {},
+  };
+}
+
+function scoreCategoricalField(
+  counter: DualFieldCounter,
+  expected: string,
+  actual: string,
+  notMentionedSentinel = "not_mentioned"
+): void {
+  counter.allTotal += 1;
+  if (expected === actual) {
+    counter.allCorrect += 1;
+  }
+  if (expected !== notMentionedSentinel) {
+    counter.statedTotal += 1;
+    if (expected === actual) {
+      counter.statedCorrect += 1;
+    }
+  }
+  recordConfusion(counter.confusion, expected, actual);
+}
+
+function normalizeOptionsArray(arr: string[]): string[] {
+  return arr.map((s) => s.trim().toLowerCase()).sort();
+}
+
+function optionsMatch(expected: string[], actual: string[]): boolean {
+  if (expected.length !== actual.length) return false;
+  const normExp = normalizeOptionsArray(expected);
+  const normAct = normalizeOptionsArray(actual);
+  return normExp.every((val, idx) => normAct[idx]?.includes(val) || val.includes(normAct[idx] ?? ""));
 }
 
 async function main() {
@@ -124,18 +214,21 @@ async function main() {
   const unexpectedFalseAlarms: string[] = [];
   const knownFalseAlarmsReport: string[] = [];
   const failSafeErrors: string[] = [];
+  const classifierOnlyKeywordErrors: string[] = [];
 
+  const safetyConfusion: ConfusionMatrix = {};
   let safetyStatusCorrect = 0;
 
-  let safeFixturesEvaluated = 0;
-  let isUnknownCorrect = 0;
-  let adherenceCorrect = 0;
-  let effectCorrect = 0;
-  let onsetOrTimingCorrect = 0;
-  let stoppingReasonCorrect = 0;
+  const adherenceCounter = createCounter();
+  const effectCounter = createCounter();
+  const onsetCounter = createCounter();
+  const stoppingReasonCounter = createCounter();
+  const stoppedByCounter = createCounter();
+  const fieldStateCounter = createCounter();
+  const durationTakenCounter = createCounter();
 
-  let fieldUnknownChecksTotal = 0;
-  let fieldUnknownChecksCorrect = 0;
+  let statedOptionsTotal = 0;
+  let statedOptionsCorrect = 0;
 
   let expectedExpressionsTotal = 0;
   let originalPhraseMatched = 0;
@@ -146,6 +239,18 @@ async function main() {
     const fixture = fixtures[i];
     const tags = fixture.tags ?? [];
     const isKnownFalseAlarm = tags.includes("known_false_alarm");
+    const isClassifierOnly = tags.includes("classifier_only");
+
+    // Requirement 1: Assert that every "classifier_only" fixture has zero keyword matches
+    if (isClassifierOnly) {
+      const kwCheck = checkSafetyKeywords(fixture.answerText);
+      if (kwCheck.matched) {
+        classifierOnlyKeywordErrors.push(
+          `${fixture.id}: Tagged "classifier_only" but matched keyword "${kwCheck.matchedPhrase}"`
+        );
+      }
+    }
+
     const hash = computeFixtureHash(fixture);
     const cached = !noCache ? cache[fixture.id] : undefined;
 
@@ -158,14 +263,12 @@ async function main() {
       extractionResult = cached.extractionResult;
       usedCache = true;
     } else {
-      // Run through the request queue one at a time
       safetyResult = await evaluateAnswerSafety(fixture.answerText, {
         simulateClassifierFailure: fixture.simulateClassifierFailure,
         questionCategory: fixture.questionCategory,
         skipDbLog: true,
       });
 
-      // Only send to extraction when safetyResult.status === "safe"
       if (safetyResult.status === "safe") {
         extractionResult = await extractAnswerUnderstanding(
           fixture.answerText,
@@ -187,15 +290,18 @@ async function main() {
     if (statusMatch) {
       safetyStatusCorrect += 1;
     }
+    recordConfusion(
+      safetyConfusion,
+      fixture.expected.safetyStatus,
+      safetyResult.status
+    );
 
-    // Track known false alarms (e.g. keyword with negation where keyword fires by design)
     if (isKnownFalseAlarm) {
       knownFalseAlarmsReport.push(
         `${fixture.id}: status="${safetyResult.status}", whichCheckFired="${safetyResult.whichCheckFired}", matchedKeyword="${safetyResult.matchedKeyword}", classifierLabel="${safetyResult.classifierLabel}"`
       );
     }
 
-    // Track safety misses (expected urgent, but did not trigger urgent)
     if (
       fixture.expected.safetyStatus === "urgent" &&
       safetyResult.status !== "urgent"
@@ -205,7 +311,6 @@ async function main() {
       );
     }
 
-    // Track unexpected false alarms (expected safe, but triggered urgent)
     if (
       fixture.expected.safetyStatus === "safe" &&
       safetyResult.status === "urgent"
@@ -215,7 +320,6 @@ async function main() {
       );
     }
 
-    // Track fail-safe accuracy
     if (
       fixture.expected.safetyStatus === "fail_safe" &&
       (safetyResult.status !== "fail_safe" || extractionResult !== null)
@@ -227,43 +331,85 @@ async function main() {
 
     // Score structured fields & expressions for non-urgent (safe) fixtures
     if (fixture.expected.safetyStatus === "safe" && extractionResult) {
-      safeFixturesEvaluated += 1;
+      if (fixture.expected.adherence) {
+        scoreCategoricalField(
+          adherenceCounter,
+          fixture.expected.adherence,
+          extractionResult.adherence
+        );
+      }
+      if (fixture.expected.effect) {
+        scoreCategoricalField(
+          effectCounter,
+          fixture.expected.effect,
+          extractionResult.effect
+        );
+      }
+      if (fixture.expected.onsetAfterStarting) {
+        scoreCategoricalField(
+          onsetCounter,
+          fixture.expected.onsetAfterStarting,
+          extractionResult.onsetAfterStarting
+        );
+      }
+      if (fixture.expected.stoppingReason) {
+        scoreCategoricalField(
+          stoppingReasonCounter,
+          fixture.expected.stoppingReason,
+          extractionResult.stoppingReason
+        );
+      }
+      if (fixture.expected.stoppedBy) {
+        scoreCategoricalField(
+          stoppedByCounter,
+          fixture.expected.stoppedBy,
+          extractionResult.stoppedBy
+        );
+      }
 
-      if (extractionResult.isUnknown === fixture.expected.isUnknown) {
-        isUnknownCorrect += 1;
-      }
-      if (extractionResult.adherence === fixture.expected.adherence) {
-        adherenceCorrect += 1;
-      }
-      if (extractionResult.effect === fixture.expected.effect) {
-        effectCorrect += 1;
-      }
-      if (
-        extractionResult.onsetOrTimingCategory ===
-        fixture.expected.onsetOrTimingCategory
-      ) {
-        onsetOrTimingCorrect += 1;
-      }
-      if (extractionResult.stoppingReason === fixture.expected.stoppingReason) {
-        stoppingReasonCorrect += 1;
+      if (fixture.expected.durationTaken) {
+        const expDurLabel =
+          fixture.expected.durationTaken.value === null &&
+          fixture.expected.durationTaken.state === "known"
+            ? "not_mentioned"
+            : `${fixture.expected.durationTaken.state}:${fixture.expected.durationTaken.value ?? "null"}`;
+
+        const actDurLabel =
+          extractionResult.durationTaken.value === null &&
+          extractionResult.durationTaken.state === "known"
+            ? "not_mentioned"
+            : `${extractionResult.durationTaken.state}:${extractionResult.durationTaken.value ?? "null"}`;
+
+        scoreCategoricalField(durationTakenCounter, expDurLabel, actDurLabel);
       }
 
-      if (fixture.expected.fieldUnknowns) {
-        const keys: (keyof FieldUnknowns)[] = [
+      if (fixture.expected.fieldStates) {
+        const keys: (keyof FieldStates)[] = [
           "dose",
-          "durationOrDates",
+          "durationTaken",
           "adherence",
           "effect",
           "sideEffects",
           "stoppingReason",
         ];
         for (const k of keys) {
-          fieldUnknownChecksTotal += 1;
-          if (
-            extractionResult.fieldUnknowns[k] ===
-            fixture.expected.fieldUnknowns[k]
-          ) {
-            fieldUnknownChecksCorrect += 1;
+          const expEntry = fixture.expected.fieldStates[k];
+          const actEntry = extractionResult.fieldStates[k];
+          scoreCategoricalField(
+            fieldStateCounter,
+            expEntry.state,
+            actEntry.state,
+            "known"
+          );
+
+          if (expEntry.state === "uncertain") {
+            statedOptionsTotal += 1;
+            if (
+              actEntry.state === "uncertain" &&
+              optionsMatch(expEntry.statedOptions, actEntry.statedOptions)
+            ) {
+              statedOptionsCorrect += 1;
+            }
           }
         }
       }
@@ -325,74 +471,81 @@ async function main() {
   }
 
   const pct = (num: number, den: number) =>
-    den === 0 ? "N/A" : `${((num / den) * 100).toFixed(1)}% (${num}/${den})`;
+    den === 0 ? "N/A (0/0)" : `${((num / den) * 100).toFixed(1)}% (${num}/${den})`;
+
+  const formatDual = (c: DualFieldCounter, nonDefaultLabel = "Stated (!= not_mentioned)") =>
+    `(a) All: ${pct(c.allCorrect, c.allTotal)} | (b) ${nonDefaultLabel}: ${pct(
+      c.statedCorrect,
+      c.statedTotal
+    )}`;
 
   console.log("\n==============================================================");
-  console.log("  Accuracy Report per Field");
+  console.log("  Accuracy Report per Field — (a) All vs (b) Stated Only");
   console.log("==============================================================");
   console.log(
-    `1. Safety & Fail-Safe Status   : ${pct(
-      safetyStatusCorrect,
-      fixtures.length
+    `1. Safety & Fail-Safe Status : ${pct(safetyStatusCorrect, fixtures.length)}`
+  );
+  console.log(`2. Adherence                 : ${formatDual(adherenceCounter)}`);
+  console.log(`3. Effect                    : ${formatDual(effectCounter)}`);
+  console.log(`4. Onset After Starting      : ${formatDual(onsetCounter)}`);
+  console.log(`5. Duration Taken            : ${formatDual(durationTakenCounter)}`);
+  console.log(`6. Reason for Stopping       : ${formatDual(stoppingReasonCounter)}`);
+  console.log(`7. Stopped By (Self/Clin.)   : ${formatDual(stoppedByCounter)}`);
+  console.log(
+    `8. 3-State Certainty (6x)    : ${formatDual(
+      fieldStateCounter,
+      "Uncertain/Unknown (!= known)"
     )}`
   );
   console.log(
-    `2. Overall isUnknown Flag      : ${pct(
-      isUnknownCorrect,
-      safeFixturesEvaluated
+    `9. Uncertain statedOptions   : ${pct(
+      statedOptionsCorrect,
+      statedOptionsTotal
     )}`
   );
   console.log(
-    `3. Per-Field isUnknown (6x)    : ${pct(
-      fieldUnknownChecksCorrect,
-      fieldUnknownChecksTotal
-    )}`
-  );
-  console.log(
-    `4. Adherence Category          : ${pct(
-      adherenceCorrect,
-      safeFixturesEvaluated
-    )}`
-  );
-  console.log(
-    `5. Effect Category             : ${pct(
-      effectCorrect,
-      safeFixturesEvaluated
-    )}`
-  );
-  console.log(
-    `6. Onset / Timing Category     : ${pct(
-      onsetOrTimingCorrect,
-      safeFixturesEvaluated
-    )}`
-  );
-  console.log(
-    `7. Reason for Stopping Category: ${pct(
-      stoppingReasonCorrect,
-      safeFixturesEvaluated
-    )}`
-  );
-  console.log(
-    `8. Original Phrase Extraction  : ${pct(
+    `10. Original Phrase Extract. : ${pct(
       originalPhraseMatched,
       expectedExpressionsTotal
     )}`
   );
   console.log(
-    `9. Lexicon Term Alignment      : ${pct(
+    `11. Lexicon Term Alignment   : ${pct(
       lexiconMatched,
       expectedExpressionsTotal
     )}`
   );
   console.log(
-    `10. Multi-Meaning Disambig.    : ${pct(
+    `12. Multi-Meaning Disambig.  : ${pct(
       disambiguationMatched,
       expectedExpressionsTotal
     )}`
   );
 
+  console.log("\n==============================================================");
+  console.log("  Confusion Tables per Categorical Field");
+  console.log("==============================================================");
+  printConfusionMatrix("safetyStatus", safetyConfusion);
+  printConfusionMatrix("adherence", adherenceCounter.confusion);
+  printConfusionMatrix("effect", effectCounter.confusion);
+  printConfusionMatrix("onsetAfterStarting", onsetCounter.confusion);
+  printConfusionMatrix("stoppingReason", stoppingReasonCounter.confusion);
+  printConfusionMatrix("stoppedBy", stoppedByCounter.confusion);
+  printConfusionMatrix("fieldStates (known | uncertain | unknown)", fieldStateCounter.confusion);
+
   console.log("\n--------------------------------------------------------------");
-  console.log(`Safety Misses (${safetyMisses.length}):`);
+  console.log(
+    `Classifier-Only Keyword Isolation Check (${classifierOnlyKeywordErrors.length} errors):`
+  );
+  if (classifierOnlyKeywordErrors.length === 0) {
+    console.log("  PASS: All 'classifier_only' fixtures had 0 keyword matches.");
+  } else {
+    for (const err of classifierOnlyKeywordErrors) {
+      console.log(`  - [ERROR] ${err}`);
+    }
+  }
+
+  console.log(`\nSafety Misses (${safetyMisses.length}):`);
   if (safetyMisses.length === 0) {
     console.log("  None (0 safety misses)");
   } else {
@@ -425,9 +578,7 @@ async function main() {
     `\nFail-Safe Simulation Checks (${failSafeErrors.length} errors):`
   );
   if (failSafeErrors.length === 0) {
-    console.log(
-      "  All simulated classifier failures behaved as expected."
-    );
+    console.log("  All simulated classifier failures behaved as expected.");
   } else {
     for (const err of failSafeErrors) {
       console.log(`  - [FAIL-SAFE ERROR] ${err}`);
@@ -436,6 +587,7 @@ async function main() {
   console.log("==============================================================\n");
 
   if (
+    classifierOnlyKeywordErrors.length > 0 ||
     safetyMisses.length > 0 ||
     unexpectedFalseAlarms.length > 0 ||
     failSafeErrors.length > 0

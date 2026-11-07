@@ -7,16 +7,18 @@ import {
 } from "@/lib/request-queue";
 
 /**
- * Common Hinglish token spelling variant map (applied both before and after
- * repeated-letter collapsing so variants like nahi/nahin/nhi/nai, mann/man/mn,
- * saans/sans, jeene/jine, dwai/dawai, bht/bahut, bhr/bhar normalize identically).
+ * Whole-token Hinglish spelling variant map used ONLY by normalise() for safety
+ * keyword matching.
+ *
+ * Notes on exclusions:
+ * - "nai" is intentionally excluded because "nai" (नई) means "new" (e.g. "nai dawai").
+ * - "saas" is intentionally excluded because "saas" (सास) means "mother-in-law".
  */
-const HINGLISH_VARIANT_MAP: Record<string, string> = {
-  // Negation variants -> "nahi"
+const HINGLISH_TOKEN_MAP: Record<string, string> = {
+  // Negation variants -> "nahi" ("nai" excluded)
   nahi: "nahi",
   nahin: "nahi",
   nhi: "nahi",
-  nai: "nahi",
   nahee: "nahi",
   nhin: "nahi",
 
@@ -26,10 +28,9 @@ const HINGLISH_VARIANT_MAP: Record<string, string> = {
   mn: "man",
   mannn: "man",
 
-  // Breath variants -> "sans"
+  // Breath variants -> "sans" ("saas" excluded)
   saans: "sans",
   sans: "sans",
-  saas: "sans",
   saansein: "sans",
 
   // Living variants -> "jine"
@@ -57,43 +58,27 @@ const HINGLISH_VARIANT_MAP: Record<string, string> = {
   khayaal: "khayal",
   khyal: "khayal",
 
-  // Pills / medicine / common clinical Hinglish tokens
+  // Pills -> "goliyan"
   goliyaan: "goliyan",
   goliyan: "goliyan",
   goliya: "goliyan",
   golia: "goliyan",
-  dawai: "dawai",
-  dwai: "dawai",
-  dawa: "dawai",
-  dwa: "dawai",
-  bahut: "bahut",
-  bht: "bahut",
-  bhut: "bahut",
-  bohot: "bahut",
-  boht: "bahut",
-  bhar: "bhar",
-  bhr: "bhar",
-  sar: "sar",
-  sir: "sar",
-  muh: "muh",
-  munh: "muh",
-  mooh: "muh",
-  kaampna: "kampna",
-  kampna: "kampna",
-  kaampte: "kampte",
-  kampte: "kampte",
 };
 
 /**
- * Normalises input text (Hindi Devanagari, Hinglish, or English) before keyword
- * and lexicon matching:
+ * Normalises input text strictly for safety keyword matching.
+ * (Extraction always receives the patient's original text unchanged.)
+ *
+ * Steps:
  * 1. Lowercases text.
  * 2. Normalises Devanagari:
- *    - Decomposes NFD to strip nukta (\u093C) so क़/क, ख़/ख, ग़/ग, ज़/ज, ड़/ड, ढ़/ढ, फ़/फ match equally.
- *    - Maps chandrabindu (ँ, \u0901) to anusvara (ं, \u0902) so साँस/सांस, गोलियाँ/गोलियां, उठूँ/उठूं, दूँ/दूं match equally.
+ *    - Decomposes NFD and removes nukta (\u093C) so क़/क, ख़/ख, ग़/ग, ज़/ज, ड़/ड, ढ़/ढ, फ़/फ are equal.
+ *    - Maps chandrabindu (ँ, \u0901) to anusvara (ं, \u0902) so साँस/सांस, गोलियाँ/गोलियां, उठूँ/उठूं, दूँ/दूं are equal.
  * 3. Strips punctuation (retaining Latin a-z, digits 0-9, and Devanagari \u0900-\u097F).
- * 4. Maps common Hinglish spelling variants (e.g. nahi/nahin/nhi/nai, mann/man/mn, saans/sans),
- *    collapses repeated Latin letters (aa->a, ee->e, oo->o, nn->n), and re-applies variant mapping.
+ * 4. Splits into whole whitespace-delimited tokens. For each Latin token:
+ *    - Applies HINGLISH_TOKEN_MAP to the whole token only (never substrings).
+ *    - Collapses repeated letters (e.g. aa->a, ee->e, oo->o, nn->n), except preserving "saas" distinct from "sans".
+ *    - Re-applies HINGLISH_TOKEN_MAP to the collapsed whole token.
  */
 export function normalise(text: string): string {
   const deNukta = text
@@ -101,10 +86,8 @@ export function normalise(text: string): string {
     .normalize("NFD")
     .replace(/\u093C/g, "")
     .normalize("NFC")
-    // Treat Devanagari chandrabindu (ँ) and anusvara (ं) as equal
     .replace(/\u0901/g, "\u0902");
 
-  // Strip punctuation (preserve Latin letters, numbers, Devanagari block, and spaces)
   const stripped = deNukta
     .replace(/[^a-z0-9\u0900-\u097F\s]/g, " ")
     .replace(/\s+/g, " ")
@@ -113,11 +96,15 @@ export function normalise(text: string): string {
   if (!stripped) return "";
 
   const tokens = stripped.split(" ").map((token) => {
-    // Only apply Latin letter-collapsing and Hinglish variant mapping to ASCII tokens
     if (/^[a-z0-9]+$/.test(token)) {
-      const firstPass = HINGLISH_VARIANT_MAP[token] ?? token;
-      const collapsed = firstPass.replace(/([a-z])\1+/g, "$1");
-      return HINGLISH_VARIANT_MAP[collapsed] ?? collapsed;
+      if (Object.prototype.hasOwnProperty.call(HINGLISH_TOKEN_MAP, token)) {
+        return HINGLISH_TOKEN_MAP[token];
+      }
+      const collapsed = token.replace(/([a-z])\1+/g, "$1");
+      if (Object.prototype.hasOwnProperty.call(HINGLISH_TOKEN_MAP, collapsed)) {
+        return HINGLISH_TOKEN_MAP[collapsed];
+      }
+      return collapsed;
     }
     return token;
   });
@@ -136,8 +123,7 @@ export interface SafetyKeywordRule {
 
 /**
  * Curated safety keyword and phrase list across English, Hinglish, and Hindi (Devanagari).
- * Duplicate entries covered by normalise() (e.g. mann/man, nahi/nhi, saans/sans,
- * self-harm/self harm, nukta and chandrabindu variants) have been removed.
+ * Duplicate entries covered by normalise() have been removed.
  */
 export const SAFETY_KEYWORDS: SafetyKeywordRule[] = [
   // --- ENGLISH: Self-harm, suicide, overdose ---
@@ -275,9 +261,38 @@ export interface SafetyEvaluationResult {
 }
 
 /**
+ * Checks whether `ruleTokens` appear as an exact contiguous sequence of whole tokens
+ * inside `inputTokens`. Guarantees token-boundary matching so "end it all"
+ * never matches "spend it all".
+ */
+function containsContiguousTokenSequence(
+  inputTokens: string[],
+  ruleTokens: string[]
+): boolean {
+  if (ruleTokens.length === 0 || inputTokens.length < ruleTokens.length) {
+    return false;
+  }
+
+  const limit = inputTokens.length - ruleTokens.length;
+  for (let i = 0; i <= limit; i++) {
+    let allMatch = true;
+    for (let j = 0; j < ruleTokens.length; j++) {
+      if (inputTokens[i + j] !== ruleTokens[j]) {
+        allMatch = false;
+        break;
+      }
+    }
+    if (allMatch) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Deterministic keyword check across English, Hinglish, and Hindi (Devanagari).
- * Runs `normalise()` on both the input text and each keyword rule before matching.
- * Always executes synchronously, even if the Gemini classifier fails.
+ * Runs `normalise()` on both the input text and each keyword rule and matches
+ * strictly on whole-token boundaries.
  */
 export function checkSafetyKeywords(answerText: string): KeywordCheckResult {
   const normalizedInput = normalise(answerText);
@@ -285,12 +300,14 @@ export function checkSafetyKeywords(answerText: string): KeywordCheckResult {
     return { matched: false, matchedPhrase: null, category: null };
   }
 
-  // Pad with spaces so short tokens match on word boundaries while multi-word phrases match cleanly
-  const paddedInput = ` ${normalizedInput} `;
+  const inputTokens = normalizedInput.split(" ");
 
   for (const rule of SAFETY_KEYWORDS) {
     const normalizedRule = normalise(rule.phrase);
-    if (normalizedRule && paddedInput.includes(` ${normalizedRule} `)) {
+    if (!normalizedRule) continue;
+
+    const ruleTokens = normalizedRule.split(" ");
+    if (containsContiguousTokenSequence(inputTokens, ruleTokens)) {
       return {
         matched: true,
         matchedPhrase: rule.phrase,
@@ -307,18 +324,12 @@ export function checkSafetyKeywords(answerText: string): KeywordCheckResult {
 }
 
 export interface ClassifierSimulationOptions {
-  /**
-   * Used only by the evaluation harness to simulate classifier failure modes
-   * and verify that the fail-safe triggers as required.
-   */
   simulateClassifierFailure?: "TIMEOUT" | "INVALID_JSON" | null;
   minGapMs?: number;
 }
 
 /**
  * Runs the Gemini Flash-Lite safety classifier through the centralized request queue.
- * Throws TechnicalApiError if the API times out, exhausts 429 retries, or returns
- * output that fails Zod validation.
  */
 export async function runSafetyClassifier(
   answerText: string,
@@ -420,7 +431,7 @@ export async function evaluateAnswerSafety(
     skipDbLog?: boolean;
   }
 ): Promise<SafetyEvaluationResult> {
-  // Step 1: Always run the synchronous keyword check (with normalise())
+  // Step 1: Always run the synchronous keyword check (using normalise() on whole tokens)
   const keywordResult = checkSafetyKeywords(answerText);
 
   // Step 2: Run the LLM classifier via the rate-limited queue
@@ -483,7 +494,6 @@ export async function evaluateAnswerSafety(
     const failureMessage =
       error instanceof Error ? error.message : String(error);
 
-    // Even when the classifier fails, if the keyword check matched, treat as URGENT
     if (keywordResult.matched) {
       const result: SafetyEvaluationResult = {
         status: "urgent",
@@ -498,7 +508,6 @@ export async function evaluateAnswerSafety(
       return result;
     }
 
-    // Fail-safe: classifier failed and keyword check did not match -> pause interview, do NOT extract
     const failSafeResult: SafetyEvaluationResult = {
       status: "fail_safe",
       whichCheckFired: "classifier_failure",
@@ -517,10 +526,6 @@ export async function evaluateAnswerSafety(
   }
 }
 
-/**
- * Logs every safety trigger and every fail-safe event to SQLite.
- * Stores metadata only by default; stores raw answerText ONLY when DEV_LOG_TEXT=true in .env.local.
- */
 async function recordSafetyLog(
   result: SafetyEvaluationResult,
   answerText: string,

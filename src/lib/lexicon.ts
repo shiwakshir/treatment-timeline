@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { normalise } from "@/lib/safety";
 
 export interface LexiconEntry {
   id: string;
@@ -35,16 +34,26 @@ export function loadLexicon(): LexiconFile {
   return parsed;
 }
 
+function cleanCaseAndPunctuation(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[.,!?;:'"()[\]{}\-_/\\।]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /**
  * Finds all lexicon entries whose Hindi, Hinglish, or variant forms appear
- * in the user's answer text after running `normalise()`.
+ * in the patient's answer text.
+ * Note: Does NOT use safety `normalise()`, keeping `normalise()` strictly
+ * for safety keyword matching and passing original text unchanged to extraction.
  */
 export function findMatchingLexiconEntries(answerText: string): {
   entry: LexiconEntry;
   matchedSubstring: string;
 }[] {
   const lexicon = loadLexicon();
-  const paddedNormAnswer = ` ${normalise(answerText)} `;
+  const paddedCleanAnswer = ` ${cleanCaseAndPunctuation(answerText)} `;
   const matches: { entry: LexiconEntry; matchedSubstring: string }[] = [];
 
   for (const entry of lexicon.entries) {
@@ -54,12 +63,11 @@ export function findMatchingLexiconEntries(answerText: string): {
       ...entry.variants,
     ];
 
-    // Sort longest variant first so specific phrases ("dil ghabrata hai") match before single words
     const sortedCandidates = [...candidates].sort((a, b) => b.length - a.length);
 
     for (const candidate of sortedCandidates) {
-      const normCandidate = normalise(candidate);
-      if (normCandidate && paddedNormAnswer.includes(` ${normCandidate} `)) {
+      const cleanCand = cleanCaseAndPunctuation(candidate);
+      if (cleanCand && paddedCleanAnswer.includes(` ${cleanCand} `)) {
         matches.push({
           entry,
           matchedSubstring: candidate,
