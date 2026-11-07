@@ -8,11 +8,11 @@
 export const APP_CONFIG = {
   models: {
     // Confirm these model IDs are free in my Google AI Studio dashboard.
-    safetyClassifier: "gemini-2.5-flash-lite",
+    safetyClassifier: "gemini-3.5-flash-lite",
     safetyTemperature: 0,
 
     // Free stable Flash model with low temperature (<= 0.2) for clinical extraction
-    extraction: "gemini-2.5-flash",
+    extraction: "gemini-3.5-flash",
     extractionTemperature: 0.1,
   },
   api: {

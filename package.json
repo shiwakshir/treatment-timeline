@@ -9,6 +9,7 @@
     "start": "next start",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "check:env": "tsx scripts/check-env.ts",
     "test:normalise": "tsx tests/normalise.test.ts",
     "eval": "tsx scripts/eval.ts"
   },
