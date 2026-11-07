@@ -15,17 +15,23 @@ import {
   SafetyEvaluationResult,
 } from "../src/lib/safety";
 import {
-  AdherenceCategory,
-  DurationTaken,
-  EffectCategory,
+  AdherenceValue,
+  EffectValue,
   extractAnswerUnderstanding,
   ExtractionOutput,
-  FieldStates,
+  FieldStateStatus,
   InterviewQuestionCategory,
-  OnsetAfterStartingCategory,
-  StoppedByCategory,
-  StoppingReasonCategory,
+  OnsetAfterStartingValue,
+  SideEffectsValue,
+  StoppedByValue,
+  StoppingReasonValue,
 } from "../src/lib/extraction";
+
+interface StructuredFieldFixture<T = string> {
+  state: FieldStateStatus;
+  value: T | null;
+  statedOptions: string[];
+}
 
 interface ExpectedExpressionFixture {
   originalPhrase: string;
@@ -43,14 +49,15 @@ interface EvalFixture {
   tags?: string[];
   expected: {
     safetyStatus: SafetyDecisionStatus;
-    adherence: AdherenceCategory | null;
-    effect: EffectCategory | null;
-    onsetAfterStarting: OnsetAfterStartingCategory | null;
-    durationTaken: DurationTaken | null;
-    scheduleText: string | null;
-    stoppingReason: StoppingReasonCategory | null;
-    stoppedBy: StoppedByCategory | null;
-    fieldStates: FieldStates | null;
+    adherence: StructuredFieldFixture<AdherenceValue> | null;
+    effect: StructuredFieldFixture<EffectValue> | null;
+    sideEffects: StructuredFieldFixture<SideEffectsValue> | null;
+    stoppingReason: StructuredFieldFixture<StoppingReasonValue> | null;
+    stoppedBy: StructuredFieldFixture<StoppedByValue> | null;
+    dose: StructuredFieldFixture<string> | null;
+    durationTaken: StructuredFieldFixture<string> | null;
+    onsetAfterStarting: StructuredFieldFixture<OnsetAfterStartingValue> | null;
+    doseTimingText: string | null;
     expectedExpressions: ExpectedExpressionFixture[];
   };
 }
@@ -79,7 +86,7 @@ function computeFixtureHash(fixture: EvalFixture): string {
     questionCategory: fixture.questionCategory,
     simulateClassifierFailure: fixture.simulateClassifierFailure,
     models: APP_CONFIG.models,
-    schemaVersion: "v3-onset-duration-fieldstates-stoppedby",
+    schemaVersion: "v4-unified-field-objects-no-freetext-readback",
   });
   return crypto.createHash("sha256").update(payload).digest("hex");
 }
@@ -96,7 +103,7 @@ function loadEvalCache(): EvalCacheMap {
 }
 
 function saveEvalCache(cache: EvalCacheMap): void {
-  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, JSON.stringify ? 2 : 2), "utf-8");
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2), "utf-8");
 }
 
 function recordConfusion(
@@ -119,8 +126,10 @@ function printConfusionMatrix(title: string, matrix: ConfusionMatrix): void {
   );
   if (labels.length === 0) return;
 
-  console.log(`\n  Confusion Table: ${title} (Rows = Expected, Cols = Predicted)`);
-  const colWidth = Math.max(14, ...labels.map((l) => l.length + 2));
+  console.log(
+    `\n  Confusion Table: ${title} (Rows = Expected, Cols = Predicted)`
+  );
+  const colWidth = Math.max(16, ...labels.map((l) => l.length + 2));
   const pad = (s: string) => s.padEnd(colWidth, " ");
 
   const header = `    ${pad("Expected \\ Pred")} | ${labels.map(pad).join(" | ")}`;
@@ -153,25 +162,6 @@ function createCounter(): DualFieldCounter {
   };
 }
 
-function scoreCategoricalField(
-  counter: DualFieldCounter,
-  expected: string,
-  actual: string,
-  notMentionedSentinel = "not_mentioned"
-): void {
-  counter.allTotal += 1;
-  if (expected === actual) {
-    counter.allCorrect += 1;
-  }
-  if (expected !== notMentionedSentinel) {
-    counter.statedTotal += 1;
-    if (expected === actual) {
-      counter.statedCorrect += 1;
-    }
-  }
-  recordConfusion(counter.confusion, expected, actual);
-}
-
 function normalizeOptionsArray(arr: string[]): string[] {
   return arr.map((s) => s.trim().toLowerCase()).sort();
 }
@@ -180,7 +170,60 @@ function optionsMatch(expected: string[], actual: string[]): boolean {
   if (expected.length !== actual.length) return false;
   const normExp = normalizeOptionsArray(expected);
   const normAct = normalizeOptionsArray(actual);
-  return normExp.every((val, idx) => normAct[idx]?.includes(val) || val.includes(normAct[idx] ?? ""));
+  return normExp.every(
+    (val, idx) =>
+      normAct[idx]?.includes(val) || val.includes(normAct[idx] ?? "")
+  );
+}
+
+function formatFieldLabel(f: StructuredFieldFixture<unknown>): string {
+  if (f.state === "known") {
+    return `known:${String(f.value ?? "")}`;
+  }
+  if (f.state === "uncertain") {
+    return `uncertain:[${f.statedOptions.join(",")}]`;
+  }
+  return f.state; // "unknown" | "not_mentioned"
+}
+
+function isFieldEqual(
+  expected: StructuredFieldFixture<unknown>,
+  actual: StructuredFieldFixture<unknown>
+): boolean {
+  if (expected.state !== actual.state) return false;
+  if (expected.state === "known") {
+    return (
+      String(expected.value ?? "").toLowerCase() ===
+      String(actual.value ?? "").toLowerCase()
+    );
+  }
+  if (expected.state === "uncertain") {
+    return optionsMatch(expected.statedOptions, actual.statedOptions);
+  }
+  return actual.value === null && actual.statedOptions.length === 0;
+}
+
+function scoreUnifiedField(
+  counter: DualFieldCounter,
+  expected: StructuredFieldFixture<unknown>,
+  actual: StructuredFieldFixture<unknown>
+): void {
+  const matched = isFieldEqual(expected, actual);
+  counter.allTotal += 1;
+  if (matched) {
+    counter.allCorrect += 1;
+  }
+
+  if (expected.state !== "not_mentioned") {
+    counter.statedTotal += 1;
+    if (matched) {
+      counter.statedCorrect += 1;
+    }
+  }
+
+  const expLabel = formatFieldLabel(expected);
+  const actLabel = matched ? expLabel : formatFieldLabel(actual);
+  recordConfusion(counter.confusion, expLabel, actLabel);
 }
 
 async function main() {
@@ -221,14 +264,12 @@ async function main() {
 
   const adherenceCounter = createCounter();
   const effectCounter = createCounter();
-  const onsetCounter = createCounter();
+  const sideEffectsCounter = createCounter();
   const stoppingReasonCounter = createCounter();
   const stoppedByCounter = createCounter();
-  const fieldStateCounter = createCounter();
+  const doseCounter = createCounter();
   const durationTakenCounter = createCounter();
-
-  let statedOptionsTotal = 0;
-  let statedOptionsCorrect = 0;
+  const onsetCounter = createCounter();
 
   let expectedExpressionsTotal = 0;
   let originalPhraseMatched = 0;
@@ -241,7 +282,6 @@ async function main() {
     const isKnownFalseAlarm = tags.includes("known_false_alarm");
     const isClassifierOnly = tags.includes("classifier_only");
 
-    // Requirement 1: Assert that every "classifier_only" fixture has zero keyword matches
     if (isClassifierOnly) {
       const kwCheck = checkSafetyKeywords(fixture.answerText);
       if (kwCheck.matched) {
@@ -307,7 +347,7 @@ async function main() {
       safetyResult.status !== "urgent"
     ) {
       safetyMisses.push(
-        `${fixture.id}: Expected URGENT but got "${safetyResult.status}" (whichCheckFired=${safetyResult.whichCheckFired}, text: "${fixture.answerText}")`
+        `${fixture.id}: Expected URGENT but got "${safetyResult.status}" (whichCheckFired=${safetyResult.whichCheckFired}, failure=${safetyResult.failureReason ?? "none"})`
       );
     }
 
@@ -329,89 +369,62 @@ async function main() {
       );
     }
 
-    // Score structured fields & expressions for non-urgent (safe) fixtures
     if (fixture.expected.safetyStatus === "safe" && extractionResult) {
       if (fixture.expected.adherence) {
-        scoreCategoricalField(
+        scoreUnifiedField(
           adherenceCounter,
           fixture.expected.adherence,
           extractionResult.adherence
         );
       }
       if (fixture.expected.effect) {
-        scoreCategoricalField(
+        scoreUnifiedField(
           effectCounter,
           fixture.expected.effect,
           extractionResult.effect
         );
       }
-      if (fixture.expected.onsetAfterStarting) {
-        scoreCategoricalField(
-          onsetCounter,
-          fixture.expected.onsetAfterStarting,
-          extractionResult.onsetAfterStarting
+      if (fixture.expected.sideEffects) {
+        scoreUnifiedField(
+          sideEffectsCounter,
+          fixture.expected.sideEffects,
+          extractionResult.sideEffects
         );
       }
       if (fixture.expected.stoppingReason) {
-        scoreCategoricalField(
+        scoreUnifiedField(
           stoppingReasonCounter,
           fixture.expected.stoppingReason,
           extractionResult.stoppingReason
         );
       }
       if (fixture.expected.stoppedBy) {
-        scoreCategoricalField(
+        scoreUnifiedField(
           stoppedByCounter,
           fixture.expected.stoppedBy,
           extractionResult.stoppedBy
         );
       }
-
-      if (fixture.expected.durationTaken) {
-        const expDurLabel =
-          fixture.expected.durationTaken.value === null &&
-          fixture.expected.durationTaken.state === "known"
-            ? "not_mentioned"
-            : `${fixture.expected.durationTaken.state}:${fixture.expected.durationTaken.value ?? "null"}`;
-
-        const actDurLabel =
-          extractionResult.durationTaken.value === null &&
-          extractionResult.durationTaken.state === "known"
-            ? "not_mentioned"
-            : `${extractionResult.durationTaken.state}:${extractionResult.durationTaken.value ?? "null"}`;
-
-        scoreCategoricalField(durationTakenCounter, expDurLabel, actDurLabel);
+      if (fixture.expected.dose) {
+        scoreUnifiedField(
+          doseCounter,
+          fixture.expected.dose,
+          extractionResult.dose
+        );
       }
-
-      if (fixture.expected.fieldStates) {
-        const keys: (keyof FieldStates)[] = [
-          "dose",
-          "durationTaken",
-          "adherence",
-          "effect",
-          "sideEffects",
-          "stoppingReason",
-        ];
-        for (const k of keys) {
-          const expEntry = fixture.expected.fieldStates[k];
-          const actEntry = extractionResult.fieldStates[k];
-          scoreCategoricalField(
-            fieldStateCounter,
-            expEntry.state,
-            actEntry.state,
-            "known"
-          );
-
-          if (expEntry.state === "uncertain") {
-            statedOptionsTotal += 1;
-            if (
-              actEntry.state === "uncertain" &&
-              optionsMatch(expEntry.statedOptions, actEntry.statedOptions)
-            ) {
-              statedOptionsCorrect += 1;
-            }
-          }
-        }
+      if (fixture.expected.durationTaken) {
+        scoreUnifiedField(
+          durationTakenCounter,
+          fixture.expected.durationTaken,
+          extractionResult.durationTaken
+        );
+      }
+      if (fixture.expected.onsetAfterStarting) {
+        scoreUnifiedField(
+          onsetCounter,
+          fixture.expected.onsetAfterStarting,
+          extractionResult.onsetAfterStarting
+        );
       }
 
       for (const expExpr of fixture.expected.expectedExpressions) {
@@ -471,10 +484,12 @@ async function main() {
   }
 
   const pct = (num: number, den: number) =>
-    den === 0 ? "N/A (0/0)" : `${((num / den) * 100).toFixed(1)}% (${num}/${den})`;
+    den === 0
+      ? "N/A (0/0)"
+      : `${((num / den) * 100).toFixed(1)}% (${num}/${den})`;
 
-  const formatDual = (c: DualFieldCounter, nonDefaultLabel = "Stated (!= not_mentioned)") =>
-    `(a) All: ${pct(c.allCorrect, c.allTotal)} | (b) ${nonDefaultLabel}: ${pct(
+  const formatDual = (c: DualFieldCounter) =>
+    `(a) All: ${pct(c.allCorrect, c.allTotal)} | (b) Stated (!= not_mentioned): ${pct(
       c.statedCorrect,
       c.statedTotal
     )}`;
@@ -485,24 +500,14 @@ async function main() {
   console.log(
     `1. Safety & Fail-Safe Status : ${pct(safetyStatusCorrect, fixtures.length)}`
   );
-  console.log(`2. Adherence                 : ${formatDual(adherenceCounter)}`);
-  console.log(`3. Effect                    : ${formatDual(effectCounter)}`);
-  console.log(`4. Onset After Starting      : ${formatDual(onsetCounter)}`);
-  console.log(`5. Duration Taken            : ${formatDual(durationTakenCounter)}`);
-  console.log(`6. Reason for Stopping       : ${formatDual(stoppingReasonCounter)}`);
-  console.log(`7. Stopped By (Self/Clin.)   : ${formatDual(stoppedByCounter)}`);
-  console.log(
-    `8. 3-State Certainty (6x)    : ${formatDual(
-      fieldStateCounter,
-      "Uncertain/Unknown (!= known)"
-    )}`
-  );
-  console.log(
-    `9. Uncertain statedOptions   : ${pct(
-      statedOptionsCorrect,
-      statedOptionsTotal
-    )}`
-  );
+  console.log(`2. adherence                 : ${formatDual(adherenceCounter)}`);
+  console.log(`3. effect                    : ${formatDual(effectCounter)}`);
+  console.log(`4. sideEffects               : ${formatDual(sideEffectsCounter)}`);
+  console.log(`5. stoppingReason            : ${formatDual(stoppingReasonCounter)}`);
+  console.log(`6. stoppedBy                 : ${formatDual(stoppedByCounter)}`);
+  console.log(`7. dose                      : ${formatDual(doseCounter)}`);
+  console.log(`8. durationTaken             : ${formatDual(durationTakenCounter)}`);
+  console.log(`9. onsetAfterStarting        : ${formatDual(onsetCounter)}`);
   console.log(
     `10. Original Phrase Extract. : ${pct(
       originalPhraseMatched,
@@ -528,10 +533,12 @@ async function main() {
   printConfusionMatrix("safetyStatus", safetyConfusion);
   printConfusionMatrix("adherence", adherenceCounter.confusion);
   printConfusionMatrix("effect", effectCounter.confusion);
-  printConfusionMatrix("onsetAfterStarting", onsetCounter.confusion);
+  printConfusionMatrix("sideEffects", sideEffectsCounter.confusion);
   printConfusionMatrix("stoppingReason", stoppingReasonCounter.confusion);
   printConfusionMatrix("stoppedBy", stoppedByCounter.confusion);
-  printConfusionMatrix("fieldStates (known | uncertain | unknown)", fieldStateCounter.confusion);
+  printConfusionMatrix("dose", doseCounter.confusion);
+  printConfusionMatrix("durationTaken", durationTakenCounter.confusion);
+  printConfusionMatrix("onsetAfterStarting", onsetCounter.confusion);
 
   console.log("\n--------------------------------------------------------------");
   console.log(

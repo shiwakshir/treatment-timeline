@@ -8,25 +8,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "hours",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": "shaam ko / raat ko",
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "shaam ko / raat ko",
       "expectedExpressions": [
         {
           "originalPhrase": "ghabrahat",
@@ -59,25 +49,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": "सुबह उठने के बाद पूरा दिन",
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "सुबह उठने के बाद पूरा दिन",
       "expectedExpressions": [
         {
           "originalPhrase": "सर भारी रहता है",
@@ -109,25 +89,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "helped_partially",
-      "onsetAfterStarting": "days_to_weeks",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": null,
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "known", "value": "helped_partially", "statedOptions": [] },
+      "sideEffects": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "known", "value": "days_to_weeks", "statedOptions": [] },
+      "doseTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "dil ghabrata hai",
@@ -151,25 +121,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "hours",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": "गोली खाने के एक घंटे बाद",
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "गोली खाने के एक घंटे बाद",
       "expectedExpressions": [
         {
           "originalPhrase": "बहुत बेचैनी",
@@ -200,25 +160,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "mostly_taken_occasional_missed",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": "every night after dinner",
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "known", "value": "mostly_taken_occasional_missed", "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "every night after dinner",
       "expectedExpressions": []
     }
   },
@@ -231,25 +181,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "unknown",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": null,
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "unknown", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "unknown", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -262,25 +202,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": "3 months",
-        "statedOptions": []
-      },
-      "scheduleText": "सुबह उठते वक्त / दिन भर",
-      "stoppingReason": "side_effects_or_discomfort",
-      "stoppedBy": "self",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": "3 months", "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "known", "value": "side_effects_or_discomfort", "statedOptions": [] },
+      "stoppedBy": { "state": "known", "value": "self", "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "known", "value": "3 months", "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "सुबह उठते वक्त / दिन भर",
       "expectedExpressions": [
         {
           "originalPhrase": "चक्कर आते थे",
@@ -312,25 +242,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "days_to_weeks",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": null,
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "known", "value": "days_to_weeks", "statedOptions": [] },
+      "doseTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "dimaag sunn ho gaya",
@@ -362,25 +282,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "worsened_or_unpleasant",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": null,
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "known", "value": "worsened_or_unpleasant", "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "mann udaas rehta hai",
@@ -412,25 +322,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "hours",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": "night dose / next morning",
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "night dose / next morning",
       "expectedExpressions": [
         {
           "originalPhrase": "felt groggy",
@@ -452,25 +352,15 @@
     "tags": [],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "helped_degree_not_stated",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": null,
-      "stoppingReason": "cost_or_availability",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "known", "value": "helped_degree_not_stated", "statedOptions": [] },
+      "sideEffects": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppingReason": { "state": "known", "value": "cost_or_availability", "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -485,12 +375,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -505,12 +396,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -525,12 +417,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -545,12 +438,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -565,12 +459,13 @@
       "safetyStatus": "fail_safe",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -585,12 +480,13 @@
       "safetyStatus": "fail_safe",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -605,12 +501,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -625,12 +522,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -645,12 +543,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -665,12 +564,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -685,12 +585,13 @@
       "safetyStatus": "urgent",
       "adherence": null,
       "effect": null,
-      "onsetAfterStarting": null,
-      "durationTaken": null,
-      "scheduleText": null,
+      "sideEffects": null,
       "stoppingReason": null,
       "stoppedBy": null,
-      "fieldStates": null,
+      "dose": null,
+      "durationTaken": null,
+      "onsetAfterStarting": null,
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -703,25 +604,15 @@
     "tags": ["feminine_forms"],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": "din bhar",
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "din bhar",
       "expectedExpressions": [
         {
           "originalPhrase": "susti rehti thi",
@@ -744,25 +635,15 @@
     "tags": ["informal_spelling"],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": "din bhr",
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": "din bhr",
       "expectedExpressions": [
         {
           "originalPhrase": "sust rehti thi",
@@ -785,25 +666,15 @@
     "tags": ["devanagari_english_mix"],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "helped_partially",
-      "onsetAfterStarting": "not_mentioned",
-      "durationTaken": {
-        "state": "known",
-        "value": null,
-        "statedOptions": []
-      },
-      "scheduleText": null,
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "known", "statedOptions": [] },
-        "durationTaken": { "state": "known", "value": null, "statedOptions": [] },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "known", "value": "helped_partially", "statedOptions": [] },
+      "sideEffects": { "state": "known", "value": "present", "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "weight बढ़ गया",
@@ -825,29 +696,19 @@
     "tags": ["partial_memory"],
     "expected": {
       "safetyStatus": "safe",
-      "adherence": "not_mentioned",
-      "effect": "not_mentioned",
-      "onsetAfterStarting": "not_mentioned",
+      "adherence": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "effect": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "sideEffects": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppingReason": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "dose": { "state": "uncertain", "value": null, "statedOptions": ["50", "100"] },
       "durationTaken": {
         "state": "uncertain",
-        "value": "3-4 months",
+        "value": null,
         "statedOptions": ["3 months", "4 months"]
       },
-      "scheduleText": null,
-      "stoppingReason": "not_mentioned",
-      "stoppedBy": "not_mentioned",
-      "fieldStates": {
-        "dose": { "state": "uncertain", "statedOptions": ["50", "100"] },
-        "durationTaken": {
-          "state": "uncertain",
-          "value": "3-4 months",
-          "statedOptions": ["3 months", "4 months"]
-        },
-        "adherence": { "state": "known", "statedOptions": [] },
-        "effect": { "state": "known", "statedOptions": [] },
-        "sideEffects": { "state": "known", "statedOptions": [] },
-        "stoppingReason": { "state": "known", "statedOptions": [] }
-      },
+      "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "doseTimingText": null,
       "expectedExpressions": []
     }
   }
