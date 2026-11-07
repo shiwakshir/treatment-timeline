@@ -1,0 +1,38 @@
+{
+  "name": "treatment-timeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multilingual mental health treatment history prototype (Hindi, English, Hinglish) - Not for clinical use",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "eval": "tsx scripts/eval.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "@prisma/client": "^6.5.0",
+    "lucide-react": "^0.487.0",
+    "next": "^15.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.14",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "dotenv": "^16.4.7",
+    "postcss": "^8.5.3",
+    "prisma": "^6.5.0",
+    "tailwindcss": "^4.0.14",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
