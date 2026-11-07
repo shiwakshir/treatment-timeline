@@ -316,13 +316,15 @@ async function main() {
         );
       }
 
-      cache[fixture.id] = {
-        hash,
-        timestamp: new Date().toISOString(),
-        safetyResult,
-        extractionResult,
-      };
-      saveEvalCache(cache);
+      if (safetyResult.classifierLabel !== "ERROR:MISSING_API_KEY") {
+        cache[fixture.id] = {
+          hash,
+          timestamp: new Date().toISOString(),
+          safetyResult,
+          extractionResult,
+        };
+        saveEvalCache(cache);
+      }
     }
 
     const sourceTag = usedCache ? "[CACHE]" : "[API]  ";
