@@ -1,0 +1,245 @@
+{
+  "version": "0.1.0-prototype",
+  "description": "Reference lexicon of common Hindi and Hinglish expressions of distress and medication side effects. Used as context for the understanding layer; ambiguous expressions are always disambiguated by the patient.",
+  "entries": [
+    {
+      "id": "lex-ghabrahat",
+      "termHinglish": "ghabrahat",
+      "termHindi": "घबराहट",
+      "variants": [
+        "ghabrahat",
+        "ghabraahat",
+        "ghabrahat hoti hai",
+        "ghabrahat si rehti hai",
+        "घबराहट",
+        "घबराहट होती है"
+      ],
+      "candidateMeanings": [
+        "Inner restlessness, uneasiness, or inability to relax",
+        "Sudden wave of panic, fear, or apprehension",
+        "Physical discomfort in the chest with a fast heartbeat or sweating"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-neend-nahi-aati",
+      "termHinglish": "neend nahi aati",
+      "termHindi": "नींद नहीं आती",
+      "variants": [
+        "neend nahi aati",
+        "neend nahi aana",
+        "neend bilkul nahi aati",
+        "raat ko neend nahi aati",
+        "नींद नहीं आती",
+        "रात को नींद नहीं आती",
+        "नींद नहीं आना"
+      ],
+      "candidateMeanings": [
+        "Difficulty falling asleep at night (initial insomnia)",
+        "Broken sleep with frequent waking during the night",
+        "Sleeping very few hours and waking up exhausted"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-dil-ghabrata-hai",
+      "termHinglish": "dil ghabrata hai",
+      "termHindi": "दिल घबराता है",
+      "variants": [
+        "dil ghabrata hai",
+        "dil ghabra raha tha",
+        "dil baith raha hai",
+        "dil ghabrana",
+        "दिल घबराता है",
+        "दिल घबरा रहा था",
+        "दिल बैठता है"
+      ],
+      "candidateMeanings": [
+        "Noticeable racing or pounding heartbeat (palpitations)",
+        "Sinking feeling in the chest with sudden dread or anxiety",
+        "Queasy, uneasy sensation in the chest or upper stomach (nausea/distress)"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-sar-bhaari-rehta-hai",
+      "termHinglish": "sar bhaari rehta hai",
+      "termHindi": "सर भारी रहता है",
+      "variants": [
+        "sar bhaari rehta hai",
+        "sir bhaari rehta hai",
+        "sar bhari lagta hai",
+        "sir bhari hona",
+        "सर भारी रहता है",
+        "सिर भारी रहता है",
+        "सर भारी लगता था"
+      ],
+      "candidateMeanings": [
+        "Dull pressure or tension-like heaviness in the head (headache)",
+        "Daytime grogginess, mental fog, or lingering sedation from the dose",
+        "Lightheadedness or feeling unsteady during the day"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-bechaini",
+      "termHinglish": "bechaini",
+      "termHindi": "बेचैनी",
+      "variants": [
+        "bechaini",
+        "bahut bechaini",
+        "bechaini hoti thi",
+        "sharir mein bechaini",
+        "बेचैनी",
+        "बहुत बेचैनी",
+        "बेचैनी होती थी"
+      ],
+      "candidateMeanings": [
+        "Physical restlessness or urge to keep moving/pacing (possible akathisia)",
+        "Mental agitation, worry, or emotional distress",
+        "Difficulty staying comfortable or still while trying to rest"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-mann-udaas-rehta-hai",
+      "termHinglish": "mann udaas rehta hai",
+      "termHindi": "मन उदास रहता है",
+      "variants": [
+        "mann udaas rehta hai",
+        "man udas rehta hai",
+        "mann nahi lagta",
+        "udaasi rehti hai",
+        "मन उदास रहता है",
+        "मन नहीं लगता",
+        "उदासी रहती है"
+      ],
+      "candidateMeanings": [
+        "Persistent low mood, sadness, or feeling down",
+        "Loss of interest or pleasure in daily activities",
+        "Feeling emotionally flat or discouraged"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-chakkar-aana",
+      "termHinglish": "chakkar aana",
+      "termHindi": "चक्कर आना",
+      "variants": [
+        "chakkar aana",
+        "chakkar aate hain",
+        "chakkar aate the",
+        "uthte waqt chakkar aana",
+        "चक्कर आना",
+        "चक्कर आते हैं",
+        "चक्कर आते थे"
+      ],
+      "candidateMeanings": [
+        "Lightheadedness or dizziness when standing up (postural dizziness)",
+        "Spinning sensation (vertigo) or loss of balance",
+        "Feeling faint, weak, or unsteady on one's feet"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-haath-kaampna",
+      "termHinglish": "haath kaampna",
+      "termHindi": "हाथ काँपना",
+      "variants": [
+        "haath kaampna",
+        "haath kaampte the",
+        "hath kampna",
+        "haathon mein kampan",
+        "हाथ काँपना",
+        "हाथ कांपते थे",
+        "हाथों में कंपन"
+      ],
+      "candidateMeanings": [
+        "Fine tremor or shaking in the hands (medication-related tremor)",
+        "Bodily trembling associated with anxiety or nervousness",
+        "Difficulty holding small objects steady (e.g., teacup or pen)"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-muh-sookhna",
+      "termHinglish": "muh sookhna",
+      "termHindi": "मुँह सूखना",
+      "variants": [
+        "muh sookhna",
+        "muh sookhta tha",
+        "munh sukhna",
+        "gala sookhna",
+        "मुँह सूखना",
+        "मुंह सूखता था",
+        "गला सूखना"
+      ],
+      "candidateMeanings": [
+        "Dryness of the mouth and throat (dry mouth side effect)",
+        "Feeling constantly thirsty and needing water frequently"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-thakaan-kamzori",
+      "termHinglish": "thakaan aur kamzori",
+      "termHindi": "थकान और कमज़ोरी",
+      "variants": [
+        "thakaan",
+        "kamzori",
+        "bahut thakaan",
+        "sharir mein kamzori",
+        "susti rehti thi",
+        "थकान",
+        "कमज़ोरी",
+        "सुस्ती रहती थी",
+        "शरीर में कमज़ोरी"
+      ],
+      "candidateMeanings": [
+        "Physical fatigue, low energy, or bodily weakness",
+        "Heavy daytime drowsiness or sleepiness after taking the medicine",
+        "Feeling slowed down or lacking stamina for routine tasks"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-dimaag-sunn",
+      "termHinglish": "dimaag sunn ho gaya",
+      "termHindi": "दिमाग सुन्न हो गया",
+      "variants": [
+        "dimaag sunn",
+        "dimag sunn ho gaya",
+        "dimag kaam nahi karta",
+        "sunn sa lagta hai",
+        "दिमाग सुन्न हो गया",
+        "दिमाग सुन्न रहता था"
+      ],
+      "candidateMeanings": [
+        "Emotional blunting or feeling numb to both happy and sad feelings",
+        "Cognitive slowing, difficulty concentrating, or feeling mentally blank",
+        "Strong sedation making it hard to stay alert"
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-pet-mein-gadbad",
+      "termHinglish": "pet mein gadbad",
+      "termHindi": "पेट में गड़बड़",
+      "variants": [
+        "pet mein gadbad",
+        "pet kharab",
+        "ulti jaisa lagna",
+        "ji machlana",
+        "पेट में गड़बड़",
+        "जी मिचलाना",
+        "उल्टी जैसा लगना"
+      ],
+      "candidateMeanings": [
+        "Nausea, queasiness, or feeling like vomiting after taking the dose",
+        "Stomach upset, loose stools, or abdominal cramping",
+        "Indigestion, acidity, or reduced appetite"
+      ],
+      "status": "unvalidated – needs clinician review"
+    }
+  ]
+}
