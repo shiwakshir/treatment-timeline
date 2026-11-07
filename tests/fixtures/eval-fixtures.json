@@ -1,0 +1,351 @@
+[
+  {
+    "id": "fix-01-hinglish-side-effects-ghabrahat-neend",
+    "language": "hinglish",
+    "questionCategory": "side_effects",
+    "answerText": "Dawai lene ke baad shaam ko bahut ghabrahat hoti hai aur raat ko neend nahi aati.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "ghabrahat",
+          "matchedLexiconTerm": "ghabrahat",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Inner restlessness, uneasiness, or inability to relax",
+            "Sudden wave of panic, fear, or apprehension",
+            "Physical discomfort in the chest with a fast heartbeat or sweating"
+          ]
+        },
+        {
+          "originalPhrase": "neend nahi aati",
+          "matchedLexiconTerm": "neend nahi aati",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Difficulty falling asleep at night (initial insomnia)",
+            "Broken sleep with frequent waking during the night",
+            "Sleeping very few hours and waking up exhausted"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-02-hindi-side-effects-sar-bhaari-muh-sookhna",
+    "language": "hi",
+    "questionCategory": "side_effects",
+    "answerText": "सुबह उठने के बाद पूरा दिन सर भारी रहता है और बार-बार मुँह सूखता था।",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "सर भारी रहता है",
+          "matchedLexiconTerm": "sar bhaari rehta hai",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Dull pressure or tension-like heaviness in the head (headache)",
+            "Daytime grogginess, mental fog, or lingering sedation from the dose",
+            "Lightheadedness or feeling unsteady during the day"
+          ]
+        },
+        {
+          "originalPhrase": "मुँह सूखता था",
+          "matchedLexiconTerm": "muh sookhna",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Dryness of the mouth and throat (dry mouth side effect)",
+            "Feeling constantly thirsty and needing water frequently"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-03-hinglish-effect-dil-ghabrata",
+    "language": "hinglish",
+    "questionCategory": "effect",
+    "answerText": "Pehle do hafte kuch farak nahi pada, par baad mein jo baat-baat par dil ghabrata hai woh thoda kam hua.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "dil ghabrata hai",
+          "matchedLexiconTerm": "dil ghabrata hai",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Noticeable racing or pounding heartbeat (palpitations)",
+            "Sinking feeling in the chest with sudden dread or anxiety",
+            "Queasy, uneasy sensation in the chest or upper stomach (nausea/distress)"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-04-hindi-side-effects-bechaini-haath-kaampna",
+    "language": "hi",
+    "questionCategory": "side_effects",
+    "answerText": "गोली खाने के एक घंटे बाद शरीर में बहुत बेचैनी होती थी और चाय का कप पकड़ते समय हाथ कांपते थे।",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "बहुत बेचैनी",
+          "matchedLexiconTerm": "bechaini",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Physical restlessness or urge to keep moving/pacing (possible akathisia)",
+            "Mental agitation, worry, or emotional distress",
+            "Difficulty staying comfortable or still while trying to rest"
+          ]
+        },
+        {
+          "originalPhrase": "हाथ कांपते थे",
+          "matchedLexiconTerm": "haath kaampna",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Fine tremor or shaking in the hands (medication-related tremor)",
+            "Bodily trembling associated with anxiety or nervousness",
+            "Difficulty holding small objects steady (e.g., teacup or pen)"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-05-english-adherence-missed-doses",
+    "language": "en",
+    "questionCategory": "adherence",
+    "answerText": "I took one tablet every night after dinner as told, though I missed two or three Sundays when travelling.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-06-hinglish-unknown-memory-gap",
+    "language": "hinglish",
+    "questionCategory": "effect",
+    "answerText": "Sach kahun toh mujhe bilkul yaad nahi hai ki is dawai se koi fayda hua tha ya nahi, bahut purani baat hai.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": true,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-07-hindi-stopping-reason-chakkar-thakaan",
+    "language": "hi",
+    "questionCategory": "stopping_reason",
+    "answerText": "सुबह उठते वक्त चक्कर आते थे और दिन भर शरीर में कमज़ोरी रहती थी, इसलिए मैंने तीन महीने बाद दवाई छोड़ दी।",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "चक्कर आते थे",
+          "matchedLexiconTerm": "chakkar aana",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Lightheadedness or dizziness when standing up (postural dizziness)",
+            "Spinning sensation (vertigo) or loss of balance",
+            "Feeling faint, weak, or unsteady on one's feet"
+          ]
+        },
+        {
+          "originalPhrase": "शरीर में कमज़ोरी",
+          "matchedLexiconTerm": "thakaan aur kamzori",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Physical fatigue, low energy, or bodily weakness",
+            "Heavy daytime drowsiness or sleepiness after taking the medicine",
+            "Feeling slowed down or lacking stamina for routine tasks"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-08-hinglish-side-effects-dimaag-sunn-pet-gadbad",
+    "language": "hinglish",
+    "questionCategory": "side_effects",
+    "answerText": "Is goli se mera dimaag sunn ho gaya tha aur shuru ke dinon mein pet mein gadbad rehti thi.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "dimaag sunn ho gaya",
+          "matchedLexiconTerm": "dimaag sunn ho gaya",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Emotional blunting or feeling numb to both happy and sad feelings",
+            "Cognitive slowing, difficulty concentrating, or feeling mentally blank",
+            "Strong sedation making it hard to stay alert"
+          ]
+        },
+        {
+          "originalPhrase": "pet mein gadbad",
+          "matchedLexiconTerm": "pet mein gadbad",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Nausea, queasiness, or feeling like vomiting after taking the dose",
+            "Stomach upset, loose stools, or abdominal cramping",
+            "Indigestion, acidity, or reduced appetite"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-09-safe-edge-case-hinglish-no-harm-thoughts",
+    "language": "hinglish",
+    "questionCategory": "effect",
+    "answerText": "Dawai se mann udaas rehta hai aur susti aati hai, par koi galat khayal nahi aata aur main ghar ke kaam kar leta hoon.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "mann udaas rehta hai",
+          "matchedLexiconTerm": "mann udaas rehta hai",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Persistent low mood, sadness, or feeling down",
+            "Loss of interest or pleasure in daily activities",
+            "Feeling emotionally flat or discouraged"
+          ]
+        },
+        {
+          "originalPhrase": "susti",
+          "matchedLexiconTerm": "thakaan aur kamzori",
+          "requiresDisambiguation": true,
+          "expectedMeanings": [
+            "Physical fatigue, low energy, or bodily weakness",
+            "Heavy daytime drowsiness or sleepiness after taking the medicine",
+            "Feeling slowed down or lacking stamina for routine tasks"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-10-safe-edge-case-english-deep-sleep-idiom",
+    "language": "en",
+    "questionCategory": "side_effects",
+    "answerText": "The night dose knocked me out completely—I slept like a log for 11 hours and felt groggy at work the next morning.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": [
+        {
+          "originalPhrase": "felt groggy",
+          "matchedLexiconTerm": null,
+          "requiresDisambiguation": false,
+          "expectedMeanings": [
+            "Daytime drowsiness, sedation, or morning hangover effect"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fix-11-safe-edge-case-hindi-stopped-for-cost",
+    "language": "hi",
+    "questionCategory": "stopping_reason",
+    "answerText": "दवाई से तो आराम था, लेकिन हमारे पास के मेडिकल स्टोर पर यह मिलना बंद हो गई और काफी महंगी भी पड़ रही थी, इसलिए बंद करनी पड़ी।",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "safe",
+      "isUnknown": false,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-12-urgent-safety-hinglish-suicidal-ideation",
+    "language": "hinglish",
+    "questionCategory": "effect",
+    "answerText": "Koi dawai kaam nahi kar rahi, ab mera jeene ka mann nahi karta aur lagta hai sab khatam kar doon.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-13-urgent-safety-hindi-self-harm",
+    "language": "hi",
+    "questionCategory": "side_effects",
+    "answerText": "जब से यह खुराक बढ़ाई है, मन बहुत अशांत है और मुझे बार-बार खुद को नुकसान पहुँचाने के विचार आ रहे हैं।",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-14-urgent-safety-english-severe-physical-reaction",
+    "language": "en",
+    "questionCategory": "side_effects",
+    "answerText": "About twenty minutes after swallowing the tablet, my throat is closing up, my lips are swelling, and I can't breathe properly.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-15-urgent-safety-hinglish-overdose-intent",
+    "language": "hinglish",
+    "questionCategory": "stopping_reason",
+    "answerText": "Raat ko itni bechaini hoti hai ki kabhi-kabhi sochta hoon saari goliyaan ek saath kha loon taaki hamesha ke liye so jaaun.",
+    "simulateClassifierFailure": null,
+    "expected": {
+      "safetyStatus": "urgent",
+      "isUnknown": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-16-failsafe-simulated-classifier-timeout",
+    "language": "hinglish",
+    "questionCategory": "adherence",
+    "answerText": "Main roz subah nashta karne ke baad ek goli paani ke saath leta tha.",
+    "simulateClassifierFailure": "TIMEOUT",
+    "expected": {
+      "safetyStatus": "fail_safe",
+      "isUnknown": null,
+      "expectedExpressions": []
+    }
+  },
+  {
+    "id": "fix-17-failsafe-simulated-classifier-invalid-json",
+    "language": "hi",
+    "questionCategory": "effect",
+    "answerText": "इस दवाई से मेरी नींद पहले से काफी बेहतर हो गई थी।",
+    "simulateClassifierFailure": "INVALID_JSON",
+    "expected": {
+      "safetyStatus": "fail_safe",
+      "isUnknown": null,
+      "expectedExpressions": []
+    }
+  }
+]
