@@ -31,8 +31,8 @@ export const SAFETY_HELPLINES: CountryHelplines[] = [
         notesHi: "आपातकालीन स्थिति या गंभीर शारीरिक प्रतिक्रिया के लिए 999 पर कॉल करें",
       },
       {
-        serviceEn: "NHS Mental Health Services",
-        serviceHi: "NHS मानसिक स्वास्थ्य सेवा",
+        serviceEn: "NHS 111 – urgent medical help (option 2 for mental health)",
+        serviceHi: "NHS 111 – तुरंत डॉक्टरी मदद (मानसिक स्वास्थ्य के लिए 2 दबाएँ)",
         number: "111",
         notesEn: "NHS 111 (select option 2 for mental health crisis support)",
         notesHi: "NHS 111 (मानसिक स्वास्थ्य सहायता के लिए विकल्प 2 चुनें)",
