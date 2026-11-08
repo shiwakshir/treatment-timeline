@@ -12,6 +12,7 @@
     "check:env": "tsx scripts/check-env.ts",
     "preview:readback": "tsx scripts/preview-readback.ts",
     "test:normalise": "tsx tests/normalise.test.ts",
+    "check:client-bundle": "tsx scripts/check-client-bundle.ts",
     "eval": "tsx scripts/eval.ts"
   },
   "prisma": {
