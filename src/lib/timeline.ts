@@ -237,7 +237,7 @@ export function computeMedicationGaps(
   checkField(
     "stoppedBy",
     "Stopped by",
-    "किसने बंद की",
+    "दवाई बंद करने का फ़ैसला किसने लिया",
     med.stoppedBy.state
   );
 
@@ -691,7 +691,7 @@ export function buildReadBackSummary(
     {
       state: med.effect.state,
       en: "whether it helped",
-      hi: "दवाई से कितना आराम मिला",
+      hi: "दवाई का असर",
     },
     {
       state: med.sideEffects.state,
@@ -706,7 +706,7 @@ export function buildReadBackSummary(
     {
       state: med.stoppedBy.state,
       en: "who decided to stop it",
-      hi: "दवाई किसने बंद कराई",
+      hi: "दवाई बंद करने का फ़ैसला किसने लिया",
     },
   ];
 

@@ -271,26 +271,42 @@
         "kamzori",
         "bahut thakaan",
         "sharir mein kamzori",
-        "susti rehti thi",
-        "susti",
-        "sust rehti thi",
-        "sust",
         "थकान",
         "कमज़ोरी",
-        "सुस्ती रहती थी",
         "शरीर में कमज़ोरी"
       ],
       "candidateMeanings": [
         {
-          "meaning": "Daytime drowsiness or sedation (feeling sleepy from the medication)",
-          "meaningEn": "Feeling sleepy or drowsy during the day from the medicine",
-          "meaningHi": "दवाई की वजह से दिन में बहुत नींद या सुस्ती आना",
+          "meaning": "Physical tiredness or bodily weakness",
+          "meaningEn": "Physical tiredness or weakness in the body",
+          "meaningHi": "शरीर में थकान या कमज़ोरी महसूस होना",
+          "status": "unvalidated"
+        }
+      ],
+      "status": "unvalidated – needs clinician review"
+    },
+    {
+      "id": "lex-susti-neend",
+      "termHinglish": "susti",
+      "termHindi": "सुस्ती",
+      "variants": [
+        "susti",
+        "susti rehti thi",
+        "sust",
+        "sust rehti thi",
+        "सुस्ती रहती थी"
+      ],
+      "candidateMeanings": [
+        {
+          "meaning": "Daytime drowsiness or sleepiness from the medication",
+          "meaningEn": "Drowsiness or feeling sleepy during the day",
+          "meaningHi": "दवाई की वजह से दिन में नींद या उनींदापन रहना",
           "status": "unvalidated"
         },
         {
-          "meaning": "Physical fatigue, lethargy, or bodily weakness without sleepiness",
-          "meaningEn": "Physical tiredness or lack of energy in the body without feeling sleepy",
-          "meaningHi": "नींद आए बिना शरीर में थकान, कमज़ोरी या ताकत की कमी लगना",
+          "meaning": "Sluggishness, lethargy, or low energy without sleepiness",
+          "meaningEn": "Feeling sluggish or having low energy without feeling sleepy",
+          "meaningHi": "बिना नींद आए शरीर में सुस्ती या ऊर्जा की कमी लगना",
           "status": "unvalidated"
         }
       ],

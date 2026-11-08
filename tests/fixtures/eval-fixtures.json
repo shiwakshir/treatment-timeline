@@ -231,10 +231,9 @@
         {
           "originalPhrase": "शरीर में कमज़ोरी",
           "matchedLexiconTerm": "thakaan aur kamzori",
-          "requiresDisambiguation": true,
+          "requiresDisambiguation": false,
           "expectedMeanings": [
-            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
-            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
+            "Physical tiredness or bodily weakness"
           ]
         }
       ]
@@ -312,11 +311,11 @@
         },
         {
           "originalPhrase": "susti",
-          "matchedLexiconTerm": "thakaan aur kamzori",
+          "matchedLexiconTerm": "susti",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
-            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
+            "Daytime drowsiness or sleepiness from the medication",
+            "Sluggishness, lethargy, or low energy without sleepiness"
           ]
         }
       ]
@@ -366,7 +365,7 @@
       "effect": { "state": "known", "value": "helped_degree_not_stated", "statedOptions": [] },
       "sideEffects": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "stoppingReason": { "state": "known", "value": "cost_or_availability", "statedOptions": [] },
-      "stoppedBy": { "state": "not_mentioned", "value": null, "statedOptions": [] },
+      "stoppedBy": { "state": "known", "value": "self", "statedOptions": [] },
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
@@ -639,11 +638,11 @@
       "expectedExpressions": [
         {
           "originalPhrase": "susti rehti thi",
-          "matchedLexiconTerm": "thakaan aur kamzori",
+          "matchedLexiconTerm": "susti",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
-            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
+            "Daytime drowsiness or sleepiness from the medication",
+            "Sluggishness, lethargy, or low energy without sleepiness"
           ]
         }
       ]
@@ -671,11 +670,11 @@
       "expectedExpressions": [
         {
           "originalPhrase": "sust rehti thi",
-          "matchedLexiconTerm": "thakaan aur kamzori",
+          "matchedLexiconTerm": "susti",
           "requiresDisambiguation": true,
           "expectedMeanings": [
-            "Daytime drowsiness or sedation (feeling sleepy from the medication)",
-            "Physical fatigue, lethargy, or bodily weakness without sleepiness"
+            "Daytime drowsiness or sleepiness from the medication",
+            "Sluggishness, lethargy, or low energy without sleepiness"
           ]
         }
       ]

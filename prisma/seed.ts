@@ -91,13 +91,13 @@ async function main() {
             questionCategory: "side_effects",
             originalPhrase: "susti rehti thi",
             candidateMeaningsJson: JSON.stringify([
-              "Daytime drowsiness or sedation (feeling sleepy from the medication)",
-              "Physical fatigue, lethargy, or bodily weakness without sleepiness",
+              "Daytime drowsiness or sleepiness from the medication",
+              "Sluggishness, lethargy, or low energy without sleepiness",
             ]),
             selectedMeaning:
-              "Daytime drowsiness or sedation (feeling sleepy from the medication)",
+              "Daytime drowsiness or sleepiness from the medication",
             confidence: "high",
-            matchedLexiconTerm: "thakaan aur kamzori",
+            matchedLexiconTerm: "susti",
           },
         ],
       },
