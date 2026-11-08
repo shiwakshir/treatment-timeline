@@ -7,6 +7,7 @@ import {
   StoppedByValue,
   StoppingReasonValue,
 } from "@/lib/extraction";
+import { resolvePatientMeaning } from "@/lib/lexicon";
 
 export interface StructuredFieldRecord<T = string> {
   state: FieldStateStatus;
@@ -58,6 +59,36 @@ export interface GapItem {
   labelHi: string;
 }
 
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const MONTHS_HI = [
+  "जनवरी",
+  "फ़रवरी",
+  "मार्च",
+  "अप्रैल",
+  "मई",
+  "जून",
+  "जुलाई",
+  "अगस्त",
+  "सितंबर",
+  "अक्टूबर",
+  "नवंबर",
+  "दिसंबर",
+];
+
 export function isUnknownText(value: string | null | undefined): boolean {
   if (!value) return true;
   const normalized = value.trim().toLowerCase();
@@ -71,9 +102,51 @@ export function isUnknownText(value: string | null | undefined): boolean {
 }
 
 /**
+ * Formats a date string as Month and Year (for example "जनवरी 2025" / "January 2025").
+ */
+export function formatMonthYearDate(
+  dateStr: string | null | undefined,
+  lang: "en" | "hi"
+): string {
+  if (isUnknownText(dateStr)) {
+    return lang === "en" ? "Unknown (you do not remember)" : "आपको याद नहीं है";
+  }
+
+  const trimmed = dateStr!.trim();
+  if (trimmed.toLowerCase() === "ongoing" || trimmed === "जारी है") {
+    return lang === "en" ? "Ongoing" : "अभी चल रही है";
+  }
+
+  // Match YYYY-MM or YYYY-MM-DD
+  const isoMatch = /^(\d{4})-(\d{1,2})(?:-\d{1,2})?$/.exec(trimmed);
+  if (isoMatch) {
+    const year = isoMatch[1];
+    const monthIdx = parseInt(isoMatch[2], 10) - 1;
+    if (monthIdx >= 0 && monthIdx < 12) {
+      const monthName =
+        lang === "en" ? MONTHS_EN[monthIdx] : MONTHS_HI[monthIdx];
+      return `${monthName} ${year}`;
+    }
+  }
+
+  // Match English "Month YYYY"
+  const monthYearMatch = /^([A-Za-z]+)\s+(\d{4})$/.exec(trimmed);
+  if (monthYearMatch) {
+    const monthPart = monthYearMatch[1].toLowerCase();
+    const year = monthYearMatch[2];
+    const idx = MONTHS_EN.findIndex((m) => m.toLowerCase() === monthPart);
+    if (idx >= 0) {
+      const monthName = lang === "en" ? MONTHS_EN[idx] : MONTHS_HI[idx];
+      return `${monthName} ${year}`;
+    }
+  }
+
+  return trimmed;
+}
+
+/**
  * Computes every `unknown` and `not_mentioned` field for a medication period,
- * labelling `unknown` (patient does not remember) and `not_mentioned` (not addressed)
- * distinctly in the timeline "Gaps" section.
+ * labelling `unknown` and `not_mentioned` distinctly in the timeline "Gaps" section.
  */
 export function computeMedicationGaps(
   med: TimelineMedicationRecord
@@ -90,15 +163,15 @@ export function computeMedicationGaps(
       gaps.push({
         fieldKey,
         gapType: "unknown",
-        labelEn: `${nameEn}: Unknown (patient does not remember)`,
-        labelHi: `${nameHi}: अज्ञात (मरीज़ को याद नहीं है)`,
+        labelEn: `${nameEn}: Unknown (not remembered)`,
+        labelHi: `${nameHi}: आपको याद नहीं है`,
       });
     } else if (state === "not_mentioned") {
       gaps.push({
         fieldKey,
         gapType: "not_mentioned",
         labelEn: `${nameEn}: Not mentioned`,
-        labelHi: `${nameHi}: उल्लेख नहीं किया गया`,
+        labelHi: `${nameHi}: आपने इसका ज़िक्र नहीं किया`,
       });
     }
   };
@@ -107,51 +180,51 @@ export function computeMedicationGaps(
     gaps.push({
       fieldKey: "genericName",
       gapType: "unknown",
-      labelEn: "Medicine name: Unknown (patient does not remember)",
-      labelHi: "दवाई का नाम: अज्ञात (मरीज़ को याद नहीं है)",
+      labelEn: "Medicine name: Unknown (not remembered)",
+      labelHi: "दवाई का नाम: आपको याद नहीं है",
     });
   }
   if (isUnknownText(med.startDate)) {
     gaps.push({
       fieldKey: "startDate",
       gapType: "unknown",
-      labelEn: "Start date: Unknown (patient does not remember)",
-      labelHi: "शुरू करने की तारीख: अज्ञात (मरीज़ को याद नहीं है)",
+      labelEn: "Start date: Unknown (not remembered)",
+      labelHi: "शुरू करने का समय: आपको याद नहीं है",
     });
   }
   if (isUnknownText(med.stopDate)) {
     gaps.push({
       fieldKey: "stopDate",
       gapType: "unknown",
-      labelEn: "Stop date: Unknown (patient does not remember)",
-      labelHi: "बंद करने की तारीख: अज्ञात (मरीज़ को याद नहीं है)",
+      labelEn: "Stop date: Unknown (not remembered)",
+      labelHi: "बंद करने का समय: आपको याद नहीं है",
     });
   }
 
-  checkField("dose", "Dose", "खुराक (Dose)", med.dose.state);
+  checkField("dose", "Dose", "खुराक", med.dose.state);
   checkField(
     "durationTaken",
     "Duration taken",
-    "दवाई लेने की अवधि",
+    "कितने समय तक ली",
     med.durationTaken.state
   );
   checkField(
     "adherence",
     "Adherence",
-    "दवाई लेने का नियम",
+    "दवाई कैसे ली",
     med.adherence.state
   );
   checkField("effect", "Effect", "दवाई का असर", med.effect.state);
   checkField(
     "sideEffects",
     "Side effects",
-    "दुष्प्रभाव (Side effects)",
+    "परेशानी या साइड इफेक्ट",
     med.sideEffects.state
   );
   checkField(
     "onsetAfterStarting",
     "Onset after starting",
-    "शुरू करने के बाद असर/परेशानी का समय",
+    "असर या परेशानी कब शुरू हुई",
     med.onsetAfterStarting.state
   );
   checkField(
@@ -172,43 +245,43 @@ export function computeMedicationGaps(
 
 const ADHERENCE_TEMPLATES: Record<AdherenceValue, { en: string; hi: string }> = {
   taken_as_prescribed: {
-    en: "Taken regularly as prescribed.",
-    hi: "दवाई बताए गए तरीके से नियमित रूप से ली गई।",
+    en: "You took the medicine regularly as prescribed.",
+    hi: "आपने दवाई डॉक्टर के बताए अनुसार नियमित रूप से ली।",
   },
   mostly_taken_occasional_missed: {
-    en: "Mostly taken as prescribed, with occasional missed doses.",
-    hi: "दवाई अधिकतर समय पर ली गई, बस कभी-कभी खुराक छूट गई।",
+    en: "You mostly took the medicine as prescribed, with occasional missed doses.",
+    hi: "आपने दवाई अधिकतर समय पर ली, बस कभी-कभी खुराक छूट गई।",
   },
   irregular_or_frequently_missed: {
-    en: "Taken irregularly, or doses were frequently missed or changed.",
-    hi: "दवाई अनियमित रूप से ली गई या खुराक कई बार छूटी।",
+    en: "You took the medicine irregularly, or missed doses frequently.",
+    hi: "आपने दवाई अनियमित रूप से ली या कई बार खुराक छूट गई।",
   },
   not_taken: {
-    en: "The medicine was not taken.",
-    hi: "यह दवाई नहीं ली गई।",
+    en: "You did not take this medicine.",
+    hi: "आपने यह दवाई नहीं ली।",
   },
 };
 
 const EFFECT_TEMPLATES: Record<EffectValue, { en: string; hi: string }> = {
   helped_significantly: {
-    en: "The medicine helped significantly.",
-    hi: "इस दवाई से काफी आराम मिला।",
+    en: "You felt the medicine helped significantly.",
+    hi: "इस दवाई से आपको काफी आराम मिला।",
   },
   helped_partially: {
-    en: "The medicine helped partially.",
-    hi: "इस दवाई से थोड़ा (आंशिक) आराम मिला।",
+    en: "You felt the medicine helped partially.",
+    hi: "इस दवाई से आपको थोड़ा आराम मिला।",
   },
   helped_degree_not_stated: {
-    en: "The medicine helped (how much was not stated).",
-    hi: "इस दवाई से आराम तो था (कितना फर्क पड़ा, यह स्पष्ट नहीं है)।",
+    en: "You felt the medicine helped (you did not mention how much).",
+    hi: "इस दवाई से आपको आराम मिला (कितना फर्क पड़ा, यह आपने नहीं बताया)।",
   },
   no_benefit: {
-    en: "No benefit was noticed from the medicine.",
-    hi: "इस दवाई से कोई खास फायदा महसूस नहीं हुआ।",
+    en: "You did not notice any benefit from the medicine.",
+    hi: "इस दवाई से आपको कोई खास फायदा महसूस नहीं हुआ।",
   },
   worsened_or_unpleasant: {
-    en: "Felt worse or unpleasant while taking the medicine.",
-    hi: "दवाई लेने के दौरान तबीयत या मन और उदास/असहज रहा।",
+    en: "You felt worse or unpleasant while taking the medicine.",
+    hi: "दवाई लेने के दौरान आपको तबीयत या मन और उदास या असहज लगा।",
   },
 };
 
@@ -217,12 +290,12 @@ const SIDE_EFFECTS_TEMPLATES: Record<
   { en: string; hi: string }
 > = {
   present: {
-    en: "Side effects or physical/mental discomfort were reported.",
-    hi: "दवाई लेते समय शरीर या मन में परेशानी (दुष्प्रभाव) महसूस हुई।",
+    en: "You experienced side effects or discomfort while taking the medicine.",
+    hi: "दवाई लेते समय आपको शरीर या मन में परेशानी महसूस हुई।",
   },
   none: {
-    en: "No side effects were reported.",
-    hi: "दवाई से कोई दुष्प्रभाव या परेशानी नहीं हुई।",
+    en: "You did not experience any side effects.",
+    hi: "इस दवाई से आपको कोई परेशानी या साइड इफेक्ट नहीं हुआ।",
   },
 };
 
@@ -231,39 +304,39 @@ const STOPPING_REASON_TEMPLATES: Record<
   { en: string; hi: string }
 > = {
   side_effects_or_discomfort: {
-    en: "Stopped because of side effects or discomfort.",
-    hi: "परेशानी या दुष्प्रभाव होने की वजह से दवाई बंद कर दी गई।",
+    en: "You stopped because of side effects or discomfort.",
+    hi: "परेशानी या साइड इफेक्ट होने की वजह से आपने दवाई बंद कर दी।",
   },
   lack_of_effect: {
-    en: "Stopped because it did not seem to help.",
-    hi: "फायदा न लगने की वजह से दवाई बंद कर दी गई।",
+    en: "You stopped because the medicine did not seem to help.",
+    hi: "फायदा न लगने की वजह से आपने दवाई बंद कर दी।",
   },
   felt_better: {
-    en: "Stopped after feeling better.",
-    hi: "तबीयत ठीक लगने के बाद दवाई बंद कर दी गई।",
+    en: "You stopped after feeling better.",
+    hi: "तबीयत ठीक लगने के बाद आपने दवाई बंद कर दी।",
   },
   cost_or_availability: {
-    en: "Stopped because the medicine was expensive or unavailable at the pharmacy.",
-    hi: "दवाई महंगी होने या मेडिकल स्टोर पर न मिलने की वजह से बंद करनी पड़ी।",
+    en: "You had to stop because the medicine was expensive or unavailable at the pharmacy.",
+    hi: "दवाई महंगी होने या मेडिकल स्टोर पर न मिलने की वजह से आपको यह बंद करनी पड़ी।",
   },
   clinician_advised: {
-    en: "Stopped or changed on the doctor's advice.",
-    hi: "डॉक्टर की सलाह से दवाई बंद या बदली गई।",
+    en: "Stopped or changed on your doctor's advice.",
+    hi: "डॉक्टर की सलाह पर आपने दवाई बंद की या बदली।",
   },
   still_taking: {
-    en: "Still taking this medicine.",
-    hi: "यह दवाई अभी भी चल रही है।",
+    en: "You are still taking this medicine.",
+    hi: "आप यह दवाई अभी भी ले रहे हैं।",
   },
 };
 
 const STOPPED_BY_TEMPLATES: Record<StoppedByValue, { en: string; hi: string }> = {
   self: {
-    en: "Stopped by the patient.",
-    hi: "मरीज़ ने खुद यह दवाई छोड़ी।",
+    en: "You stopped this medicine yourself.",
+    hi: "आपने खुद यह दवाई छोड़ी।",
   },
   clinician: {
-    en: "Stopped by the clinician.",
-    hi: "डॉक्टर ने यह दवाई बंद की।",
+    en: "Your doctor stopped this medicine.",
+    hi: "डॉक्टर ने यह दवाई बंद कराई।",
   },
 };
 
@@ -272,16 +345,16 @@ const ONSET_TEMPLATES: Record<
   { en: string; hi: string }
 > = {
   hours: {
-    en: "Began within hours of starting the medicine.",
-    hi: "दवाई शुरू करने के कुछ ही घंटों में यह बदलाव दिखा।",
+    en: "Within hours of starting the medicine.",
+    hi: "दवाई शुरू करने के कुछ ही घंटों में आपको यह बदलाव महसूस हुआ।",
   },
   days_to_weeks: {
-    en: "Began days to weeks after starting the medicine.",
-    hi: "दवाई शुरू करने के कुछ दिनों या हफ़्तों बाद यह असर/बदलाव दिखा।",
+    en: "Days to weeks after starting the medicine.",
+    hi: "दवाई शुरू करने के कुछ दिनों या हफ़्तों बाद आपको यह बदलाव महसूस हुआ।",
   },
   months: {
-    en: "Began months after starting the medicine.",
-    hi: "दवाई शुरू करने के कुछ महीनों बाद यह बदलाव दिखा।",
+    en: "Months after starting the medicine.",
+    hi: "दवाई शुरू करने के कुछ महीनों बाद आपको यह बदलाव महसूस हुआ।",
   },
 };
 
@@ -300,23 +373,25 @@ function formatStateFallback(
 ): string {
   if (field.state === "unknown") {
     return lang === "en"
-      ? "Unknown (patient does not remember)."
-      : "याद नहीं है (अज्ञात)।";
+      ? "You do not remember."
+      : "आपको याद नहीं है।";
   }
   if (field.state === "uncertain") {
     if (lang === "en") {
       const opts = field.statedOptions.join(" or ");
-      return `Uncertain (possibly ${opts || "unspecified"}).`;
+      return `You were not sure (possibly ${opts || "unspecified"}).`;
     } else {
       const localizedOpts =
         fieldContext === "duration"
           ? field.statedOptions.map(localizeDurationToHindi)
           : field.statedOptions;
       const opts = localizedOpts.join(" या ");
-      return `पक्के तौर पर याद नहीं है (संभवतः ${opts || "अनिश्चित"})।`;
+      return `आपको पक्का याद नहीं है (शायद ${opts || "अनिश्चित"})।`;
     }
   }
-  return lang === "en" ? "Not mentioned." : "उल्लेख नहीं किया गया।";
+  return lang === "en"
+    ? "You did not mention this."
+    : "आपने इसका ज़िक्र नहीं किया।";
 }
 
 export function formatAdherenceSentence(
@@ -373,20 +448,24 @@ export function formatDoseSentence(
   lang: "en" | "hi"
 ): string {
   if (dose.state === "known" && dose.value) {
-    return lang === "en" ? `Dose: ${dose.value}.` : `खुराक: ${dose.value}।`;
+    return lang === "en"
+      ? `Dose: You took ${dose.value}.`
+      : `खुराक: आपने ${dose.value} ली।`;
   }
   if (dose.state === "uncertain") {
     const opts = dose.statedOptions.join(lang === "en" ? " or " : " या ");
     return lang === "en"
-      ? `Dose: Uncertain (possibly ${opts}).`
-      : `खुराक: पक्के तौर पर याद नहीं है (शायद ${opts} थी)।`;
+      ? `Dose: You were not sure (possibly ${opts}).`
+      : `खुराक: आपको पक्का याद नहीं है (शायद ${opts} थी)।`;
   }
   if (dose.state === "unknown") {
     return lang === "en"
-      ? "Dose: Unknown (patient does not remember)."
-      : "खुराक: याद नहीं है (अज्ञात)।";
+      ? "Dose: You do not remember."
+      : "खुराक: आपको याद नहीं है।";
   }
-  return lang === "en" ? "Dose: Not mentioned." : "खुराक: उल्लेख नहीं किया गया।";
+  return lang === "en"
+    ? "Dose: You did not mention this."
+    : "खुराक: आपने इसका ज़िक्र नहीं किया।";
 }
 
 export function formatDurationSentence(
@@ -395,8 +474,8 @@ export function formatDurationSentence(
 ): string {
   if (durationTaken.state === "known" && durationTaken.value) {
     return lang === "en"
-      ? `Duration taken: ${durationTaken.value}.`
-      : `दवाई लेने की अवधि: लगभग ${localizeDurationToHindi(durationTaken.value)} तक ली गई।`;
+      ? `Duration taken: You took it for ${durationTaken.value}.`
+      : `कितने समय तक ली: आपने यह दवाई ${localizeDurationToHindi(durationTaken.value)} तक ली।`;
   }
   if (durationTaken.state === "uncertain") {
     const opts =
@@ -404,17 +483,17 @@ export function formatDurationSentence(
         ? durationTaken.statedOptions.join(" or ")
         : durationTaken.statedOptions.map(localizeDurationToHindi).join(" या ");
     return lang === "en"
-      ? `Duration taken: Uncertain (possibly ${opts}).`
-      : `दवाई लेने की अवधि: पक्के तौर पर याद नहीं है (लगभग ${opts} तक ली थी)।`;
+      ? `Duration taken: You were not sure (possibly ${opts}).`
+      : `कितने समय तक ली: आपको पक्का याद नहीं है (शायद ${opts} तक ली थी)।`;
   }
   if (durationTaken.state === "unknown") {
     return lang === "en"
-      ? "Duration taken: Unknown (patient does not remember)."
-      : "दवाई लेने की अवधि: याद नहीं है (अज्ञात)।";
+      ? "Duration taken: You do not remember."
+      : "कितने समय तक ली: आपको याद नहीं है।";
   }
   return lang === "en"
-    ? "Duration taken: Not mentioned."
-    : "दवाई लेने की अवधि: उल्लेख नहीं किया गया।";
+    ? "Duration taken: You did not mention this."
+    : "कितने समय तक ली: आपने इसका ज़िक्र नहीं किया।";
 }
 
 export function formatOnsetSentence(
@@ -422,11 +501,13 @@ export function formatOnsetSentence(
   lang: "en" | "hi"
 ): string {
   if (onsetAfterStarting.state === "known" && onsetAfterStarting.value) {
-    return ONSET_TEMPLATES[onsetAfterStarting.value][lang];
+    return lang === "en"
+      ? `When effects/side effects started: ${ONSET_TEMPLATES[onsetAfterStarting.value].en}`
+      : `असर या परेशानी कब शुरू हुई: ${ONSET_TEMPLATES[onsetAfterStarting.value].hi}`;
   }
   return lang === "en"
-    ? `Onset after starting: ${formatStateFallback(onsetAfterStarting, "en")}`
-    : `शुरू करने के बाद असर दिखने का समय: ${formatStateFallback(
+    ? `When effects/side effects started: ${formatStateFallback(onsetAfterStarting, "en")}`
+    : `असर या परेशानी कब शुरू हुई: ${formatStateFallback(
         onsetAfterStarting,
         "hi"
       )}`;
@@ -434,8 +515,11 @@ export function formatOnsetSentence(
 
 /**
  * Deterministic read-back summary built purely in code from the stored
- * structured fields and confirmed clinical meanings using fixed sentence templates
+ * structured fields and plain-language meanings using fixed sentence templates
  * in Hindi and English (never free-text LLM output).
+ * - Uses second person ("आपने" / "आपको" in Hindi, "You" in English).
+ * - Uses `meaningHi` in the Hindi read-back and plain-language `meaningEn` in the English read-back.
+ * - Shows dates as Month and Year (e.g. "जनवरी 2025" / "January 2025").
  */
 export function buildReadBackSummary(
   med: TimelineMedicationRecord,
@@ -445,13 +529,16 @@ export function buildReadBackSummary(
 
   const medName = isUnknownText(med.genericName)
     ? lang === "en"
-      ? "Unknown (patient does not remember)"
-      : "याद नहीं है (अज्ञात)"
+      ? "Unknown (you do not remember)"
+      : "आपको नाम याद नहीं है"
     : med.genericName;
+
+  const formattedStart = formatMonthYearDate(med.startDate, lang);
+  const formattedStop = formatMonthYearDate(med.stopDate, lang);
 
   if (lang === "en") {
     lines.push(
-      `Medicine: ${medName} | Start date: ${med.startDate} | Stop date: ${med.stopDate}`
+      `Medicine: ${medName} | Start date: ${formattedStart} | Stop date: ${formattedStop}`
     );
     lines.push(formatDoseSentence(med.dose, "en"));
     lines.push(formatDurationSentence(med.durationTaken, "en"));
@@ -459,13 +546,13 @@ export function buildReadBackSummary(
     if (med.doseTimingText) {
       lines.push(`Dose timing / daily pattern: ${med.doseTimingText}.`);
     }
-    lines.push(`Adherence: ${formatAdherenceSentence(med.adherence, "en")}`);
-    lines.push(`Effect: ${formatEffectSentence(med.effect, "en")}`);
+    lines.push(`How you took it: ${formatAdherenceSentence(med.adherence, "en")}`);
+    lines.push(`How it helped: ${formatEffectSentence(med.effect, "en")}`);
     lines.push(
-      `Side effects: ${formatSideEffectsSentence(med.sideEffects, "en")}`
+      `Side effects or discomfort: ${formatSideEffectsSentence(med.sideEffects, "en")}`
     );
     lines.push(
-      `Stopping: ${formatStoppingSentence(
+      `Stopping details: ${formatStoppingSentence(
         med.stoppingReason,
         med.stoppedBy,
         "en"
@@ -473,27 +560,32 @@ export function buildReadBackSummary(
     );
     if (med.expressions.length > 0) {
       for (const expr of med.expressions) {
+        const plainMeaningEn = resolvePatientMeaning(
+          expr.selectedMeaning,
+          "en",
+          expr.matchedLexiconTerm
+        );
         lines.push(
-          `Confirmed meaning for "${expr.originalPhrase}": ${expr.selectedMeaning}.`
+          `What you meant by "${expr.originalPhrase}": ${plainMeaningEn}.`
         );
       }
     }
   } else {
     lines.push(
-      `दवाई का नाम: ${medName} | शुरू की तारीख: ${med.startDate} | बंद की तारीख: ${med.stopDate}`
+      `दवाई का नाम: ${medName} | शुरू करने का समय: ${formattedStart} | बंद करने का समय: ${formattedStop}`
     );
     lines.push(formatDoseSentence(med.dose, "hi"));
     lines.push(formatDurationSentence(med.durationTaken, "hi"));
     lines.push(formatOnsetSentence(med.onsetAfterStarting, "hi"));
     if (med.doseTimingText) {
-      lines.push(`दवाई लेने या असर का दैनिक समय: ${med.doseTimingText}।`);
+      lines.push(`दवाई लेने या असर का समय: ${med.doseTimingText}।`);
     }
     lines.push(
-      `दवाई लेने का नियम: ${formatAdherenceSentence(med.adherence, "hi")}`
+      `आपने दवाई कैसे ली: ${formatAdherenceSentence(med.adherence, "hi")}`
     );
     lines.push(`दवाई का असर: ${formatEffectSentence(med.effect, "hi")}`);
     lines.push(
-      `दुष्प्रभाव या परेशानी: ${formatSideEffectsSentence(
+      `परेशानी या साइड इफेक्ट: ${formatSideEffectsSentence(
         med.sideEffects,
         "hi"
       )}`
@@ -507,8 +599,13 @@ export function buildReadBackSummary(
     );
     if (med.expressions.length > 0) {
       for (const expr of med.expressions) {
+        const plainMeaningHi = resolvePatientMeaning(
+          expr.selectedMeaning,
+          "hi",
+          expr.matchedLexiconTerm
+        );
         lines.push(
-          `आपके शब्द "${expr.originalPhrase}" का चुना गया अर्थ: ${expr.selectedMeaning}।`
+          `आपके शब्द "${expr.originalPhrase}" का अर्थ: ${plainMeaningHi}।`
         );
       }
     }

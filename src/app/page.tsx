@@ -9,11 +9,13 @@ import {
   formatDoseSentence,
   formatDurationSentence,
   formatEffectSentence,
+  formatMonthYearDate,
   formatOnsetSentence,
   formatSideEffectsSentence,
   formatStoppingSentence,
   TimelineMedicationRecord,
 } from "@/lib/timeline";
+import { resolvePatientMeaning } from "@/lib/lexicon";
 
 interface PatientProfileView {
   id: string;
@@ -51,8 +53,8 @@ const UI_LABELS = {
     readBackSummaryTitle: "Confirmed Read-Back Summary",
   },
   hi: {
-    pageTitle: "मरीज़ की दवाई का इतिहास (टाइमलाइन)",
-    selectPatient: "काल्पनिक मरीज़ प्रोफ़ाइल चुनें:",
+    pageTitle: "आपकी दवाई का इतिहास (टाइमलाइन)",
+    selectPatient: "काल्पनिक प्रोफ़ाइल चुनें:",
     langToggleLabel: "भाषा / Language:",
     addMedicationBtn: "+ नई दवाई अवधि जोड़ें",
     noMeds: "अभी तक कोई पुष्ट दवाई अवधि नहीं है।",
@@ -63,16 +65,16 @@ const UI_LABELS = {
     durationLabel: "दवाई लेने की अवधि",
     onsetLabel: "शुरू करने के बाद असर का समय",
     doseTimingLabel: "दवाई का दैनिक समय",
-    adherenceLabel: "दवाई लेने का नियम (Adherence)",
+    adherenceLabel: "आपने दवाई कैसे ली (Adherence)",
     effectLabel: "दवाई का असर (Effect)",
-    sideEffectsLabel: "दुष्प्रभाव या परेशानियाँ (Side Effects)",
+    sideEffectsLabel: "परेशानी या साइड इफेक्ट (Side Effects)",
     stoppingLabel: "बंद करने की वजह और किसने बंद की",
-    patientWordsLabel: "मरीज़ के मूल शब्द:",
+    patientWordsLabel: "आपके मूल शब्द:",
     confirmedMeaningLabel: "पुष्ट किया गया अर्थ:",
     interpretedExpressionsLabel: "पुष्ट किए गए लक्षण और अर्थ:",
-    gapsSectionTitle: "अधूरी जानकारी / गैप्स (अज्ञात और अनुल्लिखित)",
-    gapBadgeUnknown: "अज्ञात (याद नहीं है)",
-    gapBadgeNotMentioned: "उल्लेख नहीं किया गया",
+    gapsSectionTitle: "अधूरी जानकारी / गैप्स (याद नहीं और ज़िक्र नहीं किया गया)",
+    gapBadgeUnknown: "याद नहीं है",
+    gapBadgeNotMentioned: "ज़िक्र नहीं किया गया",
     readBackSummaryTitle: "पुष्ट किया गया सारांश (Read-Back)",
   },
 };
@@ -223,8 +225,10 @@ export default function TimelinePage() {
                   </span>
                 </div>
                 <div className="text-sm text-gray-700">
-                  <strong>{labels.startLabel}:</strong> {med.startDate} |{" "}
-                  <strong>{labels.stopLabel}:</strong> {med.stopDate}
+                  <strong>{labels.startLabel}:</strong>{" "}
+                  {formatMonthYearDate(med.startDate, lang)} |{" "}
+                  <strong>{labels.stopLabel}:</strong>{" "}
+                  {formatMonthYearDate(med.stopDate, lang)}
                 </div>
               </div>
 
@@ -348,7 +352,18 @@ export default function TimelinePage() {
                           <span className="font-medium">
                             {labels.confirmedMeaningLabel}
                           </span>{" "}
-                          {expr.selectedMeaning}
+                          {lang === "hi"
+                            ? resolvePatientMeaning(
+                                expr.selectedMeaning,
+                                "hi",
+                                expr.matchedLexiconTerm
+                              )
+                            : expr.selectedMeaning}
+                          {lang === "hi" && (
+                            <span className="text-xs text-gray-500 ml-1">
+                              [Clinician view: {expr.selectedMeaning}]
+                            </span>
+                          )}
                         </div>
                         <span className="text-xs text-gray-500">
                           [confidence: {expr.confidence}

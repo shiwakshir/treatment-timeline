@@ -4,6 +4,7 @@ import { APP_CONFIG } from "@/config/app-config";
 import {
   findMatchingLexiconEntries,
   formatLexiconPromptReference,
+  getClinicalMeanings,
 } from "@/lib/lexicon";
 import {
   enqueueGeminiRequest,
@@ -297,7 +298,10 @@ ${answerText}
 
         if (existing) {
           existing.matchedLexiconTerm = match.entry.termHinglish;
-          existing.candidateMeanings = match.entry.candidateMeanings.slice(0, 3);
+          existing.candidateMeanings = getClinicalMeanings(match.entry).slice(
+            0,
+            3
+          );
         } else {
           const idx = answerText
             .toLowerCase()
@@ -309,7 +313,7 @@ ${answerText}
 
           output.expressions.push({
             originalPhrase: exactSubstring,
-            candidateMeanings: match.entry.candidateMeanings.slice(0, 3),
+            candidateMeanings: getClinicalMeanings(match.entry).slice(0, 3),
             confidence: "medium",
             matchedLexiconTerm: match.entry.termHinglish,
           });

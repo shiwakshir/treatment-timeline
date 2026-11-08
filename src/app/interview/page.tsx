@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { INTERVIEW_QUESTIONS } from "@/lib/interview";
+import { resolvePatientMeaning } from "@/lib/lexicon";
 import { SAFETY_HELPLINES, CountryHelplines } from "@/config/safety-helplines";
 import {
   buildReadBackSummary,
@@ -552,7 +553,7 @@ function InterviewContent() {
 
           <div>
             <label className="block font-semibold mb-1">
-              Synthetic Patient Profile / मरीज़ प्रोफ़ाइल:
+              Synthetic Profile / प्रोफ़ाइल चुनें:
             </label>
             <select
               value={patientId}
@@ -777,29 +778,45 @@ function InterviewContent() {
                   Your phrase / आपके शब्द: &ldquo;{expr.originalPhrase}&rdquo;
                 </div>
                 <div className="space-y-1.5">
-                  {expr.candidateMeanings.map((meaning) => (
-                    <label
-                      key={meaning}
-                      className="flex items-start gap-2 cursor-pointer"
-                    >
-                      <input
-                        type="radio"
-                        name={`disambig-${expr.id}`}
-                        checked={expr.selectedMeaning === meaning}
-                        onChange={() => {
-                          setPendingExpressions((prev) =>
-                            prev.map((item, i) =>
-                              i === idx
-                                ? { ...item, selectedMeaning: meaning }
-                                : item
-                            )
-                          );
-                        }}
-                        className="mt-1"
-                      />
-                      <span>{meaning}</span>
-                    </label>
-                  ))}
+                  {expr.candidateMeanings.map((meaning) => {
+                    const plainHi = resolvePatientMeaning(
+                      meaning,
+                      "hi",
+                      expr.matchedLexiconTerm
+                    );
+                    const plainEn = resolvePatientMeaning(
+                      meaning,
+                      "en",
+                      expr.matchedLexiconTerm
+                    );
+                    return (
+                      <label
+                        key={meaning}
+                        className="flex items-start gap-2 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name={`disambig-${expr.id}`}
+                          checked={expr.selectedMeaning === meaning}
+                          onChange={() => {
+                            setPendingExpressions((prev) =>
+                              prev.map((item, i) =>
+                                i === idx
+                                  ? { ...item, selectedMeaning: meaning }
+                                  : item
+                              )
+                            );
+                          }}
+                          className="mt-1"
+                        />
+                        <span>
+                          {lang === "hi"
+                            ? `${plainHi} (${plainEn})`
+                            : `${plainEn} — ${plainHi}`}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             ))}

@@ -1,12 +1,19 @@
 import fs from "fs";
 import path from "path";
 
+export interface LexiconCandidateMeaning {
+  meaning: string;
+  meaningEn: string;
+  meaningHi: string;
+  status: "unvalidated";
+}
+
 export interface LexiconEntry {
   id: string;
   termHinglish: string;
   termHindi: string;
   variants: string[];
-  candidateMeanings: string[];
+  candidateMeanings: LexiconCandidateMeaning[];
   status: string;
 }
 
@@ -32,6 +39,63 @@ export function loadLexicon(): LexiconFile {
 
   cachedLexicon = parsed;
   return parsed;
+}
+
+/**
+ * Returns the clinical meaning strings for a lexicon entry (used in clinician view and extraction).
+ */
+export function getClinicalMeanings(entry: LexiconEntry): string[] {
+  return entry.candidateMeanings.map((c) => c.meaning);
+}
+
+/**
+ * Resolves a clinical or raw meaning string to a plain-language patient-facing meaning:
+ * - For `lang === "hi"`: returns `meaningHi` from `data/lexicon.json` (plain-language Hindi, no clinical terms).
+ * - For `lang === "en"`: returns `meaningEn` from `data/lexicon.json` (plain-language English, keeping clinical terms for the clinician view only).
+ */
+export function resolvePatientMeaning(
+  meaningStr: string,
+  lang: "en" | "hi",
+  matchedLexiconTerm?: string | null
+): string {
+  const lexicon = loadLexicon();
+  const norm = meaningStr.trim().toLowerCase();
+
+  const searchEntries = matchedLexiconTerm
+    ? [
+        ...lexicon.entries.filter(
+          (e) =>
+            e.termHinglish.toLowerCase() === matchedLexiconTerm.toLowerCase() ||
+            e.termHindi === matchedLexiconTerm
+        ),
+        ...lexicon.entries,
+      ]
+    : lexicon.entries;
+
+  for (const entry of searchEntries) {
+    for (const cand of entry.candidateMeanings) {
+      if (
+        cand.meaning.toLowerCase() === norm ||
+        cand.meaningEn.toLowerCase() === norm ||
+        cand.meaningHi === meaningStr.trim()
+      ) {
+        return lang === "hi" ? cand.meaningHi : cand.meaningEn;
+      }
+    }
+  }
+
+  // Fallback for non-lexicon phrases (e.g. "Weight gain", "felt groggy")
+  if (lang === "hi") {
+    if (norm === "weight gain") {
+      return "दवाई शुरू करने के बाद वज़न बढ़ जाना";
+    }
+    if (norm.includes("groggy") || norm.includes("drowsiness")) {
+      return "दवाई की वजह से दिन में नींद या सुस्ती रहना";
+    }
+  }
+
+  // Strip parenthetical clinical terms in patient-facing English fallback
+  return meaningStr.replace(/\s*\([^)]*\)/g, "").trim();
 }
 
 function cleanCaseAndPunctuation(text: string): string {
@@ -89,7 +153,7 @@ export function formatLexiconPromptReference(): string {
     .map(
       (e) =>
         `- "${e.termHinglish}" / "${e.termHindi}" (variants: ${e.variants.join(", ")}) -> Candidate meanings: ${JSON.stringify(
-          e.candidateMeanings
+          getClinicalMeanings(e)
         )} [status: ${e.status}]`
     )
     .join("\n");

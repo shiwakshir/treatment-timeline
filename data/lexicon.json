@@ -1,6 +1,6 @@
 {
-  "version": "0.2.0-prototype",
-  "description": "Reference lexicon of common Hindi and Hinglish expressions of distress and medication side effects. Candidate meanings contain only clinically distinct differentials (consequences and restatements removed).",
+  "version": "0.3.0-prototype",
+  "description": "Reference lexicon of common Hindi and Hinglish expressions of distress and medication side effects. Each candidate meaning includes a clinical term (for clinician view only), a plain-language English meaning (meaningEn), a plain-language Hindi meaning (meaningHi), and status='unvalidated'.",
   "entries": [
     {
       "id": "lex-ghabrahat",
@@ -14,9 +14,24 @@
         "घबराहट होती है"
       ],
       "candidateMeanings": [
-        "Psychological anxiety, panic, or sudden sense of fear/dread",
-        "Physical restlessness or inner agitation (possible akathisia)",
-        "Autonomic symptoms such as racing heart (palpitations) or chest tightness"
+        {
+          "meaning": "Psychological anxiety, panic, or sudden sense of fear/dread",
+          "meaningEn": "Feeling anxious, panicky, or a sudden sense of fear",
+          "meaningHi": "मन में अचानक डर, चिंता या घबराहट महसूस होना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Physical restlessness or inner agitation (possible akathisia)",
+          "meaningEn": "Physical restlessness or feeling unable to sit still",
+          "meaningHi": "शरीर में बेचैनी होना या एक जगह शांति से बैठ न पाना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Autonomic symptoms such as racing heart (palpitations) or chest tightness",
+          "meaningEn": "Fast heartbeat or tightness in the chest",
+          "meaningHi": "दिल की धड़कन तेज़ होना या सीने में जकड़न महसूस होना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -33,8 +48,18 @@
         "नींद नहीं आना"
       ],
       "candidateMeanings": [
-        "Difficulty falling asleep at night (initial insomnia)",
-        "Fragmented sleep with frequent nighttime awakenings (maintenance insomnia)"
+        {
+          "meaning": "Difficulty falling asleep at night (initial insomnia)",
+          "meaningEn": "Difficulty falling asleep when going to bed at night",
+          "meaningHi": "रात में सोने की कोशिश करने पर देर तक नींद न आना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Fragmented sleep with frequent nighttime awakenings (maintenance insomnia)",
+          "meaningEn": "Waking up repeatedly during the night",
+          "meaningHi": "रात में बार-बार नींद खुल जाना और ठीक से सो न पाना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -52,9 +77,24 @@
         "दिल बैठता है"
       ],
       "candidateMeanings": [
-        "Awareness of fast or pounding heartbeat (palpitations)",
-        "Sudden emotional dread, sinking feeling, or acute anxiety",
-        "Epigastric uneasiness or nausea-like sensation in the upper stomach/chest"
+        {
+          "meaning": "Awareness of fast or pounding heartbeat (palpitations)",
+          "meaningEn": "Feeling your heart beating fast or pounding",
+          "meaningHi": "दिल की धड़कन तेज़ या ज़ोर-ज़ोर से चलते हुए महसूस होना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Sudden emotional dread, sinking feeling, or acute anxiety",
+          "meaningEn": "A sudden sinking feeling, worry, or strong anxiety",
+          "meaningHi": "अचानक मन बैठने लगना, डर लगना या बहुत चिंता होना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Epigastric uneasiness or nausea-like sensation in the upper stomach/chest",
+          "meaningEn": "Uneasiness or nausea-like feeling in the upper stomach or chest",
+          "meaningHi": "ऊपरी पेट या सीने में अजीब-सी उलझन या जी मिचलाने जैसा लगना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -71,9 +111,24 @@
         "सर भारी लगता था"
       ],
       "candidateMeanings": [
-        "Tension-type headache or physical pressure in the head",
-        "Daytime sedation, grogginess, or cognitive fog from the medication",
-        "Orthostatic lightheadedness or dizziness"
+        {
+          "meaning": "Tension-type headache or physical pressure in the head",
+          "meaningEn": "Headache or a feeling of physical pressure in the head",
+          "meaningHi": "सिर में दर्द या दबाव और भारीपन महसूस होना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Daytime sedation, grogginess, or cognitive fog from the medication",
+          "meaningEn": "Feeling sleepy, groggy, or foggy during the day from the medicine",
+          "meaningHi": "दवाई की वजह से दिन में नींद या सुस्ती और सिर सुन्न-सा लगना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Orthostatic lightheadedness or dizziness",
+          "meaningEn": "Feeling lightheaded or dizzy, especially when standing up",
+          "meaningHi": "सिर हल्का लगना या उठते समय चक्कर जैसा महसूस होना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -91,8 +146,18 @@
         "बेचैनी होती थी"
       ],
       "candidateMeanings": [
-        "Motor restlessness or inability to sit still (possible akathisia)",
-        "Psychological worry, inner tension, or emotional unease"
+        {
+          "meaning": "Motor restlessness or inability to sit still (possible akathisia)",
+          "meaningEn": "Physical restlessness in the body or inability to sit still",
+          "meaningHi": "शरीर में ऐसी छटपटाहट या बेचैनी होना कि एक जगह बैठना मुश्किल लगे",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Psychological worry, inner tension, or emotional unease",
+          "meaningEn": "Inner worry, mental tension, or feeling uneasy inside",
+          "meaningHi": "मन के अंदर चिंता, उलझन या अशांति महसूस होना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -109,8 +174,18 @@
         "उदासी रहती है"
       ],
       "candidateMeanings": [
-        "Depressed mood or persistent sadness",
-        "Anhedonia (loss of interest/pleasure) or medication-induced emotional blunting"
+        {
+          "meaning": "Depressed mood or persistent sadness",
+          "meaningEn": "Feeling low or persistently sad",
+          "meaningHi": "मन उदास रहना या लगातार दुखी महसूस करना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Anhedonia (loss of interest/pleasure) or medication-induced emotional blunting",
+          "meaningEn": "Loss of interest in daily activities or feeling emotionally flat",
+          "meaningHi": "किसी काम में मन न लगना या भावनाएं सुन्न-सी लगना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -128,8 +203,18 @@
         "चक्कर आते थे"
       ],
       "candidateMeanings": [
-        "Lightheadedness or feeling faint upon standing (orthostatic dizziness)",
-        "Spinning sensation (true vertigo) or vestibular imbalance"
+        {
+          "meaning": "Lightheadedness or feeling faint upon standing (orthostatic dizziness)",
+          "meaningEn": "Feeling lightheaded or faint when standing up",
+          "meaningHi": "खड़े होने या उठने पर आँखों के आगे अँधेरा छाना या बेहोशी जैसा लगना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Spinning sensation (true vertigo) or vestibular imbalance",
+          "meaningEn": "Feeling like the room is spinning or losing balance",
+          "meaningHi": "आस-पास की चीज़ें घूमती हुई लगना या शरीर का संतुलन बिगड़ना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -146,7 +231,12 @@
         "हाथों में कंपन"
       ],
       "candidateMeanings": [
-        "Hand tremor (involuntary shaking of the hands)"
+        {
+          "meaning": "Hand tremor (involuntary shaking of the hands)",
+          "meaningEn": "Shaking of the hands that you cannot control",
+          "meaningHi": "अपने-आप हाथ काँपना या कोई चीज़ पकड़ते समय हाथ हिलना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -163,7 +253,12 @@
         "गला सूखना"
       ],
       "candidateMeanings": [
-        "Dry mouth (xerostomia / anticholinergic side effect)"
+        {
+          "meaning": "Dry mouth (xerostomia / anticholinergic side effect)",
+          "meaningEn": "Dryness in the mouth or throat",
+          "meaningHi": "बार-बार मुँह या गला सूखना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -186,8 +281,18 @@
         "शरीर में कमज़ोरी"
       ],
       "candidateMeanings": [
-        "Daytime drowsiness or sedation (feeling sleepy from the medication)",
-        "Physical fatigue, lethargy, or bodily weakness without sleepiness"
+        {
+          "meaning": "Daytime drowsiness or sedation (feeling sleepy from the medication)",
+          "meaningEn": "Feeling sleepy or drowsy during the day from the medicine",
+          "meaningHi": "दवाई की वजह से दिन में बहुत नींद या सुस्ती आना",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Physical fatigue, lethargy, or bodily weakness without sleepiness",
+          "meaningEn": "Physical tiredness or lack of energy in the body without feeling sleepy",
+          "meaningHi": "नींद आए बिना शरीर में थकान, कमज़ोरी या ताकत की कमी लगना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -203,8 +308,18 @@
         "दिमाग सुन्न रहता था"
       ],
       "candidateMeanings": [
-        "Emotional blunting (feeling emotionally numb or flat)",
-        "Cognitive slowing or difficulty concentrating (brain fog)"
+        {
+          "meaning": "Emotional blunting (feeling emotionally numb or flat)",
+          "meaningEn": "Feeling emotionally numb or unable to feel normal emotions",
+          "meaningHi": "मन की भावनाएं सुन्न हो जाना (न खुशी महसूस होना, न दुख)",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Cognitive slowing or difficulty concentrating (brain fog)",
+          "meaningEn": "Difficulty thinking clearly or concentrating",
+          "meaningHi": "सोचने-समझने या ध्यान लगाने में कठिनाई और सुस्ती लगना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     },
@@ -222,8 +337,18 @@
         "उल्टी जैसा लगना"
       ],
       "candidateMeanings": [
-        "Upper gastrointestinal distress (nausea, queasiness, or dyspepsia)",
-        "Bowel disturbance (diarrhea / loose stools or constipation)"
+        {
+          "meaning": "Upper gastrointestinal distress (nausea, queasiness, or dyspepsia)",
+          "meaningEn": "Stomach discomfort, indigestion, or feeling like throwing up",
+          "meaningHi": "पेट में अपच, जलन या जी मिचलाना (उल्टी जैसा लगना)",
+          "status": "unvalidated"
+        },
+        {
+          "meaning": "Bowel disturbance (diarrhea / loose stools or constipation)",
+          "meaningEn": "Loose motions (diarrhea) or constipation",
+          "meaningHi": "दस्त लगना (पेट खराब होना) या कब्ज़ की परेशानी होना",
+          "status": "unvalidated"
+        }
       ],
       "status": "unvalidated – needs clinician review"
     }
