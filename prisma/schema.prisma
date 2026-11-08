@@ -1,5 +1,6 @@
 // Local SQLite schema for treatment-timeline (Phase 1 Prototype)
-// Designed to remain open for Phases 2-5 (photo upload, voice, clinician share links, carer input)
+// Uses unified single-object-per-field JSON storage ({ state, value, statedOptions })
+// and keeps extension hooks open for Phases 2-5.
 
 generator client {
   provider = "prisma-client-js"
@@ -7,7 +8,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model PatientProfile {
@@ -21,47 +22,44 @@ model PatientProfile {
 }
 
 model MedicationPeriod {
-  id                    String                @id @default(cuid())
-  patientId             String
-  patient               PatientProfile        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  id                     String                @id @default(cuid())
+  patientId              String
+  patient                PatientProfile        @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
-  // Core medication fields. Any field can be "unknown" (never guessed).
-  genericName           String                @default("unknown")
-  dose                  String                @default("unknown")
-  startDate             String                @default("unknown") // YYYY-MM, YYYY-MM-DD, or "unknown"
-  stopDate              String                @default("unknown") // YYYY-MM, YYYY-MM-DD, "ongoing", or "unknown"
+  // Core medication entry fields ("unknown" when patient does not know/remember)
+  genericName            String                @default("unknown")
+  startDate              String                @default("unknown")
+  stopDate               String                @default("unknown")
 
-  // Guided interview responses (raw verbatim patient words + plain summaries)
-  adherenceRaw          String
-  adherenceSummaryEn    String
-  adherenceSummaryHi    String
-  adherenceUnknown      Boolean               @default(false)
+  // Unified field objects serialized as JSON: { state, value, statedOptions }
+  doseJson               String
+  durationTakenJson      String
+  onsetAfterStartingJson String
+  doseTimingText         String?
 
-  effectRaw             String
-  effectSummaryEn       String
-  effectSummaryHi       String
-  effectUnknown         Boolean               @default(false)
+  adherenceRaw           String
+  adherenceJson          String
 
-  sideEffectsRaw        String
-  sideEffectsSummaryEn  String
-  sideEffectsSummaryHi  String
-  sideEffectsUnknown    Boolean               @default(false)
+  effectRaw              String
+  effectJson             String
 
-  stoppingReasonRaw       String
-  stoppingReasonSummaryEn String
-  stoppingReasonSummaryHi String
-  stoppingReasonUnknown   Boolean             @default(false)
+  sideEffectsRaw         String
+  sideEffectsJson        String
 
-  // Nothing appears on the timeline unless confirmedAt is non-null
-  confirmedAt           DateTime?
-  createdAt             DateTime              @default(now())
+  stoppingReasonRaw      String
+  stoppingReasonJson     String
+  stoppedByJson          String
+
+  // Read-back confirmation gate: nothing shows on timeline until confirmedAt is non-null
+  confirmedAt            DateTime?
+  createdAt              DateTime              @default(now())
 
   // Extension hooks for Later Phases (Phases 2, 3, 5)
-  sourceType            String                @default("TEXT")    // Phase 2: "PHOTO_OCR", Phase 3: "VOICE"
-  recordedByRole        String                @default("PATIENT") // Phase 5: "CARER"
-  carerRelationship     String?                                   // Phase 5 optional metadata
+  sourceType             String                @default("TEXT")    // Phase 2: "PHOTO_OCR", Phase 3: "VOICE"
+  recordedByRole         String                @default("PATIENT") // Phase 5: "CARER"
+  carerRelationship      String?
 
-  expressions           ExtractedExpression[]
+  expressions            ExtractedExpression[]
 }
 
 model ExtractedExpression {
@@ -72,7 +70,7 @@ model ExtractedExpression {
   questionCategory      String           // "adherence" | "effect" | "side_effects" | "stopping_reason"
   originalPhrase        String           // Exact phrase in patient's words
   candidateMeaningsJson String           // JSON string[] of up to 3 candidate clinical meanings
-  selectedMeaning       String           // Confirmed meaning chosen by user (or verbatim fallback)
+  selectedMeaning       String           // Confirmed meaning chosen by user
   confidence            String           // "high" | "medium" | "low"
   matchedLexiconTerm    String?          // Reference term from data/lexicon.json if matched
 }
@@ -81,10 +79,10 @@ model SafetyTriggerLog {
   id               String   @id @default(cuid())
   createdAt        DateTime @default(now())
   eventType        String   // "URGENT_TRIGGER" | "FAIL_SAFE"
-  questionCategory String?  // Which interview step was active
+  questionCategory String?
   whichCheckFired  String   // "keyword" | "classifier" | "both" | "classifier_failure"
-  matchedKeyword   String?  // Populated if keyword list matched
-  classifierLabel  String?  // Classifier category or technical error code
-  failureReason    String?  // Populated on FAIL_SAFE technical errors
+  matchedKeyword   String?
+  classifierLabel  String?
+  failureReason    String?
   answerText       String?  // Null by default; stored ONLY when DEV_LOG_TEXT=true in .env.local
 }
