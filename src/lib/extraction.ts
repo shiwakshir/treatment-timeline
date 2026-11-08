@@ -190,11 +190,12 @@ CRITICAL RULES:
      - "irregular_or_frequently_missed": frequently skipped, altered dose, or took irregularly.
      - "not_taken": never took the medicine.
    - "effect.value":
+     CRITICAL RULE: effect means only whether the medicine helped the condition it was prescribed for. Do not infer effect from side effects. If the patient does not say whether it helped, effect is not_mentioned.
      - "helped_significantly": clear, strong improvement with degree stated (e.g., sleep became much better, "काफी बेहतर हो गई थी").
      - "helped_partially": partial relief or improvement in some symptoms (e.g., "dil ghabrata hai woh thoda kam hua", "anxiety थोड़ी कम हुई").
      - "helped_degree_not_stated": patient states it helped or gave relief without specifying how much (e.g., "दवाई से तो आराम था").
      - "no_benefit": explicitly states no improvement across the trial.
-     - "worsened_or_unpleasant": patient reports feeling low, sluggish, or unpleasant on the medicine without therapeutic relief (e.g., "Dawai se mann udaas rehta hai aur susti aati hai").
+     - "worsened_or_unpleasant": ONLY when answering an effect question where the patient describes their overall condition/mood on the medicine as low or unpleasant rather than helped (e.g., "Dawai se mann udaas rehta hai aur susti aati hai, par koi galat khayal nahi aata"). Do NOT set this when the patient is merely describing side effects like ghabrahat, bechaini, dimaag sunn, or stomach upset!
    - "sideEffects.value":
      - "present": whenever the patient mentions ANY side effect, uncomfortable physical/mental symptom, or problem (e.g., ghabrahat, neend nahi aati, sar bhaari, muh sookhna, bechaini, haath kaampna, chakkar, kamzori, dimaag sunn, pet mein gadbad, mann udaas, susti, groggy, weight gain). Note: even if the questionCategory is "effect" or "stopping_reason", if a side effect or distress symptom is mentioned in the answer, set sideEffects = { "state": "known", "value": "present", "statedOptions": [] }! (Exception: in fix-03 where "dil ghabrata hai woh thoda kam hua" describes the baseline symptom that improved rather than a side effect, sideEffects is "not_mentioned".)
      - "none": patient explicitly states they experienced no side effects.

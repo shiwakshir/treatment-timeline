@@ -226,13 +226,116 @@ function scoreUnifiedField(
   recordConfusion(counter.confusion, expLabel, actLabel);
 }
 
+function isSafetyTestFixture(fixture: EvalFixture): boolean {
+  return (
+    fixture.expected.safetyStatus !== "safe" ||
+    fixture.id.includes("safe-edge-case")
+  );
+}
+
+async function runSafetyConsistencyCheck(
+  fixtures: EvalFixture[],
+  repeatCount: number
+): Promise<void> {
+  const safetyFixtures = fixtures.filter(isSafetyTestFixture);
+
+  console.log("==============================================================");
+  console.log(
+    `  Safety Consistency Check (--repeat ${repeatCount})`
+  );
+  console.log("==============================================================");
+  console.log(`Safety fixtures : ${safetyFixtures.length}`);
+  console.log(
+    `Safety model    : ${APP_CONFIG.models.safetyClassifier} (temp=${APP_CONFIG.models.safetyTemperature})`
+  );
+  console.log(`Queue min gap   : ${APP_CONFIG.api.minGapBetweenCallsMs}ms`);
+  console.log("--------------------------------------------------------------\n");
+
+  const resultsByFixture: Record<string, SafetyEvaluationResult[]> = {};
+  for (const f of safetyFixtures) {
+    resultsByFixture[f.id] = [];
+  }
+
+  for (let r = 1; r <= repeatCount; r++) {
+    console.log(`--- Run ${r} of ${repeatCount} ---`);
+    for (let i = 0; i < safetyFixtures.length; i++) {
+      const f = safetyFixtures[i];
+      const res = await evaluateAnswerSafety(f.answerText, {
+        simulateClassifierFailure: f.simulateClassifierFailure,
+        questionCategory: f.questionCategory,
+        skipDbLog: true,
+      });
+      resultsByFixture[f.id].push(res);
+      console.log(
+        `  [Run ${r}] (${String(i + 1).padStart(2, "0")}/${
+          safetyFixtures.length
+        }) ${f.id} -> status=${res.status} (expected=${
+          f.expected.safetyStatus
+        }) | checkFired=${res.whichCheckFired} [cls="${res.classifierLabel}"]`
+      );
+    }
+    console.log("");
+  }
+
+  const changedFixtures: string[] = [];
+  console.log("==============================================================");
+  console.log(
+    `  Consistency Summary Across ${repeatCount} Runs`
+  );
+  console.log("==============================================================");
+  for (const f of safetyFixtures) {
+    const runs = resultsByFixture[f.id];
+    const signatures = runs.map(
+      (r) => `${r.status}|${r.whichCheckFired}|${r.classifierLabel}`
+    );
+    const uniqueSigs = Array.from(new Set(signatures));
+    if (uniqueSigs.length > 1) {
+      changedFixtures.push(
+        `${f.id}: varied across runs -> ${signatures.join(" vs ")}`
+      );
+    }
+    console.log(
+      `  ${f.id.padEnd(48, " ")} : ${
+        uniqueSigs.length === 1 ? "CONSISTENT" : "CHANGED"
+      } (${signatures[0]})`
+    );
+  }
+
+  console.log("--------------------------------------------------------------");
+  console.log(
+    `Fixtures with changed results between runs (${changedFixtures.length}):`
+  );
+  if (changedFixtures.length === 0) {
+    console.log(
+      `  None (0 changes across ${repeatCount} runs on all ${safetyFixtures.length} safety fixtures)`
+    );
+  } else {
+    for (const c of changedFixtures) {
+      console.log(`  - [CHANGED] ${c}`);
+    }
+    process.exitCode = 1;
+  }
+  console.log("==============================================================\n");
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const noCache = args.includes("--no-cache");
+  const repeatIdx = args.indexOf("--repeat");
+  const repeatCount =
+    repeatIdx >= 0 && args[repeatIdx + 1]
+      ? Number(args[repeatIdx + 1])
+      : null;
 
   const fixtures = JSON.parse(
     fs.readFileSync(FIXTURES_PATH, "utf-8")
   ) as EvalFixture[];
+
+  if (repeatCount && repeatCount > 0) {
+    await runSafetyConsistencyCheck(fixtures, repeatCount);
+    return;
+  }
+
   const cache = noCache ? {} : loadEvalCache();
 
   console.log("==============================================================");
@@ -349,7 +452,9 @@ async function main() {
       safetyResult.status !== "urgent"
     ) {
       safetyMisses.push(
-        `${fixture.id}: Expected URGENT but got "${safetyResult.status}" (whichCheckFired=${safetyResult.whichCheckFired}, failure=${safetyResult.failureReason ?? "none"})`
+        `${fixture.id}: Expected URGENT but got "${safetyResult.status}" (whichCheckFired=${safetyResult.whichCheckFired}, failure=${
+          safetyResult.failureReason ?? "none"
+        })`
       );
     }
 
@@ -491,10 +596,10 @@ async function main() {
       : `${((num / den) * 100).toFixed(1)}% (${num}/${den})`;
 
   const formatDual = (c: DualFieldCounter) =>
-    `(a) All: ${pct(c.allCorrect, c.allTotal)} | (b) Stated (!= not_mentioned): ${pct(
-      c.statedCorrect,
-      c.statedTotal
-    )}`;
+    `(a) All: ${pct(
+      c.allCorrect,
+      c.allTotal
+    )} | (b) Stated (!= not_mentioned): ${pct(c.statedCorrect, c.statedTotal)}`;
 
   console.log("\n==============================================================");
   console.log("  Accuracy Report per Field — (a) All vs (b) Stated Only");
@@ -505,10 +610,14 @@ async function main() {
   console.log(`2. adherence                 : ${formatDual(adherenceCounter)}`);
   console.log(`3. effect                    : ${formatDual(effectCounter)}`);
   console.log(`4. sideEffects               : ${formatDual(sideEffectsCounter)}`);
-  console.log(`5. stoppingReason            : ${formatDual(stoppingReasonCounter)}`);
+  console.log(
+    `5. stoppingReason            : ${formatDual(stoppingReasonCounter)}`
+  );
   console.log(`6. stoppedBy                 : ${formatDual(stoppedByCounter)}`);
   console.log(`7. dose                      : ${formatDual(doseCounter)}`);
-  console.log(`8. durationTaken             : ${formatDual(durationTakenCounter)}`);
+  console.log(
+    `8. durationTaken             : ${formatDual(durationTakenCounter)}`
+  );
   console.log(`9. onsetAfterStarting        : ${formatDual(onsetCounter)}`);
   console.log(
     `10. Original Phrase Extract. : ${pct(

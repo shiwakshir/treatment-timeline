@@ -10,6 +10,7 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "check:env": "tsx scripts/check-env.ts",
+    "preview:readback": "tsx scripts/preview-readback.ts",
     "test:normalise": "tsx tests/normalise.test.ts",
     "eval": "tsx scripts/eval.ts"
   },
