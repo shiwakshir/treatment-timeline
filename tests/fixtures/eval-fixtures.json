@@ -16,7 +16,8 @@
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
-      "doseTimingText": "shaam ko / raat ko",
+      "doseTimingText": null,
+      "symptomTimingText": "shaam ko / raat ko",
       "expectedExpressions": [
         {
           "originalPhrase": "ghabrahat",
@@ -57,7 +58,8 @@
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
-      "doseTimingText": "सुबह उठने के बाद पूरा दिन",
+      "doseTimingText": null,
+      "symptomTimingText": "सुबह उठने के बाद पूरा दिन",
       "expectedExpressions": [
         {
           "originalPhrase": "सर भारी रहता है",
@@ -98,6 +100,7 @@
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "known", "value": "days_to_weeks", "statedOptions": [] },
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "dil ghabrata hai",
@@ -129,7 +132,8 @@
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
-      "doseTimingText": "गोली खाने के एक घंटे बाद",
+      "doseTimingText": null,
+      "symptomTimingText": "गोली खाने के एक घंटे बाद",
       "expectedExpressions": [
         {
           "originalPhrase": "बहुत बेचैनी",
@@ -169,6 +173,7 @@
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "doseTimingText": "every night after dinner",
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -190,6 +195,7 @@
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -210,7 +216,8 @@
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "known", "value": "3 months", "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
-      "doseTimingText": "सुबह उठते वक्त / दिन भर",
+      "doseTimingText": null,
+      "symptomTimingText": "सुबह उठते वक्त / दिन भर",
       "expectedExpressions": [
         {
           "originalPhrase": "चक्कर आते थे",
@@ -251,6 +258,7 @@
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "known", "value": "days_to_weeks", "statedOptions": [] },
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "dimaag sunn ho gaya",
@@ -291,6 +299,7 @@
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "mann udaas rehta hai",
@@ -330,7 +339,8 @@
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
-      "doseTimingText": "night dose / next morning",
+      "doseTimingText": "night dose",
+      "symptomTimingText": "next morning",
       "expectedExpressions": [
         {
           "originalPhrase": "felt groggy",
@@ -361,6 +371,7 @@
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -382,6 +393,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -403,6 +415,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -424,6 +437,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -445,6 +459,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -466,6 +481,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -487,6 +503,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -508,6 +525,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -529,6 +547,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -550,6 +569,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -571,6 +591,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -592,6 +613,7 @@
       "durationTaken": null,
       "onsetAfterStarting": null,
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   },
@@ -612,7 +634,8 @@
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
-      "doseTimingText": "din bhar",
+      "doseTimingText": null,
+      "symptomTimingText": "din bhar",
       "expectedExpressions": [
         {
           "originalPhrase": "susti rehti thi",
@@ -643,7 +666,8 @@
       "dose": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
-      "doseTimingText": "din bhr",
+      "doseTimingText": null,
+      "symptomTimingText": "din bhr",
       "expectedExpressions": [
         {
           "originalPhrase": "sust rehti thi",
@@ -675,6 +699,7 @@
       "durationTaken": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": [
         {
           "originalPhrase": "weight बढ़ गया",
@@ -709,6 +734,7 @@
       },
       "onsetAfterStarting": { "state": "not_mentioned", "value": null, "statedOptions": [] },
       "doseTimingText": null,
+      "symptomTimingText": null,
       "expectedExpressions": []
     }
   }

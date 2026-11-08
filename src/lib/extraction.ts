@@ -111,9 +111,10 @@ export const ExtractedExpressionSchema = z.object({
 /**
  * Strict Zod schema for the complete extraction output on a single interview answer.
  * - One object per field ({ state, value, statedOptions }), no duplicates.
- * - `doseTimingText` holds free-text time-of-day or single-dose timing.
- * - Free-text LLM summaries (`neutralSummaryEn` / `neutralSummaryHi`) are removed;
- *   read-back summaries are constructed deterministically in code from fixed templates.
+ * - `doseTimingText` holds when the patient took the medicine.
+ * - `symptomTimingText` holds when an effect or side effect happened.
+ * - Free-text LLM summaries are removed; read-back summaries are constructed
+ *   deterministically in code from fixed templates.
  */
 export const ExtractionOutputSchema = z.object({
   adherence: AdherenceFieldSchema,
@@ -125,6 +126,7 @@ export const ExtractionOutputSchema = z.object({
   durationTaken: TextFieldSchema,
   onsetAfterStarting: OnsetAfterStartingFieldSchema,
   doseTimingText: z.string().nullable(),
+  symptomTimingText: z.string().nullable(),
   expressions: z.array(ExtractedExpressionSchema),
 });
 
@@ -147,31 +149,15 @@ export type InterviewQuestionCategory =
   | "stopping_reason";
 
 /**
- * Sends a safe patient answer (original text unchanged) to the Gemini Flash
- * extraction model via the rate-limited request queue and validates the
- * response against ExtractionOutputSchema.
+ * Builds the exact extraction prompt for a patient answer.
  */
-export async function extractAnswerUnderstanding(
+export function buildExtractionPrompt(
   answerText: string,
-  questionCategory: InterviewQuestionCategory,
-  options?: { minGapMs?: number }
-): Promise<ExtractionOutput> {
-  const lexiconMatches = findMatchingLexiconEntries(answerText);
+  questionCategory: InterviewQuestionCategory
+): string {
   const lexiconReferenceText = formatLexiconPromptReference();
 
-  return enqueueGeminiRequest(
-    async () => {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey || apiKey === "your_free_google_ai_studio_api_key_here") {
-        throw new TechnicalApiError(
-          "MISSING_API_KEY",
-          "GEMINI_API_KEY is missing or not configured in .env.local"
-        );
-      }
-
-      const ai = new GoogleGenAI({ apiKey });
-
-      const prompt = `You are a neutral clinical language understanding assistant for a patient-held mental health medication timeline.
+  return `You are a neutral clinical language understanding assistant for a patient-held mental health medication timeline.
 The patient is answering a question primarily about "${questionCategory}" in Hindi (Devanagari), English, or Hinglish (including informal spellings like "dwai", "bht", "bhr", "sust").
 
 CRITICAL RULES:
@@ -196,7 +182,7 @@ CRITICAL RULES:
      - "helped_partially": partial relief or improvement in some symptoms (e.g., "dil ghabrata hai woh thoda kam hua", "anxiety थोड़ी कम हुई").
      - "helped_degree_not_stated": patient states it helped or gave relief without specifying how much (e.g., "दवाई से तो आराम था").
      - "no_benefit": explicitly states no improvement across the trial.
-     - "worsened_or_unpleasant": ONLY when answering an effect question where the patient describes their overall condition/mood on the medicine as low or unpleasant rather than helped (e.g., "Dawai se mann udaas rehta hai aur susti aati hai, par koi galat khayal nahi aata"). Do NOT set this when the patient is merely describing side effects like ghabrahat, bechaini, dimaag sunn, or stomach upset!
+     - "worsened_or_unpleasant": ONLY when answering an effect question where the patient describes their overall condition/mood on the medicine as low or unpleasant rather than helped (e.g., "Dawai se mann udaas rehta hai aur susti aati hai, par koi galat khayal nahi aata"). Do NOT set this when the patient is merely describing side effects like ghabrahat, bechaini, dimaag sunn, susti, or stomach upset!
    - "sideEffects.value":
      - "present": whenever the patient mentions ANY side effect, uncomfortable physical/mental symptom, or problem (e.g., ghabrahat, neend nahi aati, sar bhaari, muh sookhna, bechaini, haath kaampna, chakkar, kamzori, dimaag sunn, pet mein gadbad, mann udaas, susti, groggy, weight gain). Note: even if the questionCategory is "effect" or "stopping_reason", if a side effect or distress symptom is mentioned in the answer, set sideEffects = { "state": "known", "value": "present", "statedOptions": [] }! (Exception: in fix-03 where "dil ghabrata hai woh thoda kam hua" describes the baseline symptom that improved rather than a side effect, sideEffects is "not_mentioned".)
      - "none": patient explicitly states they experienced no side effects.
@@ -215,9 +201,11 @@ CRITICAL RULES:
    - "onsetAfterStarting.value": "hours" | "days_to_weeks" | "months".
      CRITICAL RULE: onsetAfterStarting means time since the patient first started the medicine, not time after a single dose.
      - If the patient says "Pehle do hafte kuch farak nahi pada, par baad mein..." or "shuru ke dinon mein pet mein gadbad rehti thi", that is time since first starting the medicine -> state="known", value="days_to_weeks".
-     - If the patient says "Dawai lene ke baad shaam ko...", "गोली खाने के एक घंटे बाद...", "The night dose knocked me out...", "सुबह उठने के बाद पूरा दिन...", or "din bhar", that is dose timing / time-of-day after a single dose, NOT time since first starting the medicine! For all of those, set onsetAfterStarting = { "state": "not_mentioned", "value": null, "statedOptions": [] } and put the timing in "doseTimingText".
+     - If the patient says "Dawai lene ke baad shaam ko...", "गोली खाने के एक घंटे बाद...", "The night dose knocked me out...", "सुबह उठने के बाद पूरा दिन...", or "din bhar", that is dose timing or symptom timing during the day, NOT time since first starting the medicine! For all of those, set onsetAfterStarting = { "state": "not_mentioned", "value": null, "statedOptions": [] }.
 
-4. "doseTimingText": free text capturing time-of-day, routine schedule, or time after a single dose (e.g., "shaam ko / raat ko", "सुबह उठने के बाद पूरा दिन", "गोली खाने के एक घंटे बाद", "every night after dinner", "सुबह उठते वक्त / दिन भर", "night dose / next morning", "din bhar", "din bhr"), or null if none stated.
+4. Timing free-text fields:
+   - "doseTimingText": when the patient took the medicine (e.g., "every night after dinner", "night dose"), or null if not stated.
+   - "symptomTimingText": when an effect or side effect happened during the day or relative to a dose (e.g., "shaam ko / raat ko", "सुबह उठने के बाद पूरा दिन", "गोली खाने के एक घंटे बाद", "सुबह उठते वक्त / दिन भर", "next morning", "din bhar", "din bhr"), or null if not stated.
 
 5. For EVERY expression of distress, symptom, or side effect in the patient's answer:
    - "originalPhrase": Copy the exact substring from the patient's answer verbatim.
@@ -240,6 +228,7 @@ Return ONLY valid JSON matching this exact schema:
   "durationTaken": { "state": "known" | "uncertain" | "unknown" | "not_mentioned", "value": string | null, "statedOptions": string[] },
   "onsetAfterStarting": { "state": "known" | "uncertain" | "unknown" | "not_mentioned", "value": "hours" | "days_to_weeks" | "months" | null, "statedOptions": string[] },
   "doseTimingText": string | null,
+  "symptomTimingText": string | null,
   "expressions": [
     {
       "originalPhrase": "exact phrase from patient input",
@@ -254,6 +243,32 @@ Patient's raw answer (unchanged):
 """
 ${answerText}
 """`;
+}
+
+/**
+ * Sends a safe patient answer (original text unchanged) to the Gemini Flash
+ * extraction model via the rate-limited request queue and validates the
+ * response against ExtractionOutputSchema.
+ */
+export async function extractAnswerUnderstanding(
+  answerText: string,
+  questionCategory: InterviewQuestionCategory,
+  options?: { minGapMs?: number }
+): Promise<ExtractionOutput> {
+  const lexiconMatches = findMatchingLexiconEntries(answerText);
+
+  return enqueueGeminiRequest(
+    async () => {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey || apiKey === "your_free_google_ai_studio_api_key_here") {
+        throw new TechnicalApiError(
+          "MISSING_API_KEY",
+          "GEMINI_API_KEY is missing or not configured in .env.local"
+        );
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      const prompt = buildExtractionPrompt(answerText, questionCategory);
 
       const response = await ai.models.generateContent({
         model: APP_CONFIG.models.extraction,

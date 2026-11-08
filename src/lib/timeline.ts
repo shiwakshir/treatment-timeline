@@ -34,6 +34,7 @@ export interface TimelineMedicationRecord {
   durationTaken: StructuredFieldRecord<string>;
   onsetAfterStarting: StructuredFieldRecord<OnsetAfterStartingValue>;
   doseTimingText: string | null;
+  symptomTimingText: string | null;
 
   adherenceRaw: string;
   adherence: StructuredFieldRecord<AdherenceValue>;
@@ -211,7 +212,7 @@ export function computeMedicationGaps(
   checkField(
     "adherence",
     "Adherence",
-    "दवाई कैसे ली",
+    "आपने दवाई कैसे ली",
     med.adherence.state
   );
   checkField("effect", "Effect", "दवाई का असर", med.effect.state);
@@ -372,9 +373,7 @@ function formatStateFallback(
   fieldContext?: "dose" | "duration" | "general"
 ): string {
   if (field.state === "unknown") {
-    return lang === "en"
-      ? "You do not remember."
-      : "आपको याद नहीं है।";
+    return lang === "en" ? "You do not remember." : "आपको याद नहीं है।";
   }
   if (field.state === "uncertain") {
     if (lang === "en") {
@@ -513,13 +512,17 @@ export function formatOnsetSentence(
       )}`;
 }
 
+function hasFieldValue(field: StructuredFieldRecord<unknown>): boolean {
+  return field.state === "known" || field.state === "uncertain";
+}
+
 /**
  * Deterministic read-back summary built purely in code from the stored
  * structured fields and plain-language meanings using fixed sentence templates
  * in Hindi and English (never free-text LLM output).
- * - Uses second person ("आपने" / "आपको" in Hindi, "You" in English).
- * - Uses `meaningHi` in the Hindi read-back and plain-language `meaningEn` in the English read-back.
- * - Shows dates as Month and Year (e.g. "जनवरी 2025" / "January 2025").
+ * - Shows ONLY fields with a value (known or uncertain).
+ * - Groups every `unknown` field into one line ("आपको याद नहीं: ..." / "You do not remember: ...").
+ * - Groups every `not_mentioned` field into one line ("इनके बारे में आपने अभी कुछ नहीं बताया: ..." / "Not discussed yet: ...").
  */
 export function buildReadBackSummary(
   med: TimelineMedicationRecord,
@@ -540,24 +543,52 @@ export function buildReadBackSummary(
     lines.push(
       `Medicine: ${medName} | Start date: ${formattedStart} | Stop date: ${formattedStop}`
     );
-    lines.push(formatDoseSentence(med.dose, "en"));
-    lines.push(formatDurationSentence(med.durationTaken, "en"));
-    lines.push(formatOnsetSentence(med.onsetAfterStarting, "en"));
-    if (med.doseTimingText) {
-      lines.push(`Dose timing / daily pattern: ${med.doseTimingText}.`);
+
+    if (hasFieldValue(med.dose)) {
+      lines.push(formatDoseSentence(med.dose, "en"));
     }
-    lines.push(`How you took it: ${formatAdherenceSentence(med.adherence, "en")}`);
-    lines.push(`How it helped: ${formatEffectSentence(med.effect, "en")}`);
-    lines.push(
-      `Side effects or discomfort: ${formatSideEffectsSentence(med.sideEffects, "en")}`
-    );
-    lines.push(
-      `Stopping details: ${formatStoppingSentence(
-        med.stoppingReason,
-        med.stoppedBy,
-        "en"
-      )}`
-    );
+    if (hasFieldValue(med.durationTaken)) {
+      lines.push(formatDurationSentence(med.durationTaken, "en"));
+    }
+    if (hasFieldValue(med.onsetAfterStarting)) {
+      lines.push(formatOnsetSentence(med.onsetAfterStarting, "en"));
+    }
+    if (med.doseTimingText) {
+      lines.push(`When you took the medicine: ${med.doseTimingText}.`);
+    }
+    if (med.symptomTimingText) {
+      lines.push(
+        `When the effect or side effect happened: ${med.symptomTimingText}.`
+      );
+    }
+    if (hasFieldValue(med.adherence)) {
+      lines.push(
+        `How you took it: ${formatAdherenceSentence(med.adherence, "en")}`
+      );
+    }
+    if (hasFieldValue(med.effect)) {
+      lines.push(`How it helped: ${formatEffectSentence(med.effect, "en")}`);
+    }
+    if (hasFieldValue(med.sideEffects)) {
+      lines.push(
+        `Side effects or discomfort: ${formatSideEffectsSentence(med.sideEffects, "en")}`
+      );
+    }
+    if (hasFieldValue(med.stoppingReason) || hasFieldValue(med.stoppedBy)) {
+      const stopParts: string[] = [];
+      if (hasFieldValue(med.stoppingReason)) {
+        stopParts.push(
+          med.stoppingReason.state === "known" && med.stoppingReason.value
+            ? STOPPING_REASON_TEMPLATES[med.stoppingReason.value].en
+            : formatStateFallback(med.stoppingReason, "en")
+        );
+      }
+      if (med.stoppedBy.state === "known" && med.stoppedBy.value) {
+        stopParts.push(STOPPED_BY_TEMPLATES[med.stoppedBy.value].en);
+      }
+      lines.push(`Stopping details: ${stopParts.join(" ")}`);
+    }
+
     if (med.expressions.length > 0) {
       for (const expr of med.expressions) {
         const plainMeaningEn = resolvePatientMeaning(
@@ -574,29 +605,53 @@ export function buildReadBackSummary(
     lines.push(
       `दवाई का नाम: ${medName} | शुरू करने का समय: ${formattedStart} | बंद करने का समय: ${formattedStop}`
     );
-    lines.push(formatDoseSentence(med.dose, "hi"));
-    lines.push(formatDurationSentence(med.durationTaken, "hi"));
-    lines.push(formatOnsetSentence(med.onsetAfterStarting, "hi"));
-    if (med.doseTimingText) {
-      lines.push(`दवाई लेने या असर का समय: ${med.doseTimingText}।`);
+
+    if (hasFieldValue(med.dose)) {
+      lines.push(formatDoseSentence(med.dose, "hi"));
     }
-    lines.push(
-      `आपने दवाई कैसे ली: ${formatAdherenceSentence(med.adherence, "hi")}`
-    );
-    lines.push(`दवाई का असर: ${formatEffectSentence(med.effect, "hi")}`);
-    lines.push(
-      `परेशानी या साइड इफेक्ट: ${formatSideEffectsSentence(
-        med.sideEffects,
-        "hi"
-      )}`
-    );
-    lines.push(
-      `दवाई बंद करने का विवरण: ${formatStoppingSentence(
-        med.stoppingReason,
-        med.stoppedBy,
-        "hi"
-      )}`
-    );
+    if (hasFieldValue(med.durationTaken)) {
+      lines.push(formatDurationSentence(med.durationTaken, "hi"));
+    }
+    if (hasFieldValue(med.onsetAfterStarting)) {
+      lines.push(formatOnsetSentence(med.onsetAfterStarting, "hi"));
+    }
+    if (med.doseTimingText) {
+      lines.push(`आप दवाई कब लेते थे: ${med.doseTimingText}।`);
+    }
+    if (med.symptomTimingText) {
+      lines.push(`परेशानी कब होती थी: ${med.symptomTimingText}।`);
+    }
+    if (hasFieldValue(med.adherence)) {
+      lines.push(
+        `आपने दवाई कैसे ली: ${formatAdherenceSentence(med.adherence, "hi")}`
+      );
+    }
+    if (hasFieldValue(med.effect)) {
+      lines.push(`दवाई का असर: ${formatEffectSentence(med.effect, "hi")}`);
+    }
+    if (hasFieldValue(med.sideEffects)) {
+      lines.push(
+        `परेशानी या साइड इफेक्ट: ${formatSideEffectsSentence(
+          med.sideEffects,
+          "hi"
+        )}`
+      );
+    }
+    if (hasFieldValue(med.stoppingReason) || hasFieldValue(med.stoppedBy)) {
+      const stopParts: string[] = [];
+      if (hasFieldValue(med.stoppingReason)) {
+        stopParts.push(
+          med.stoppingReason.state === "known" && med.stoppingReason.value
+            ? STOPPING_REASON_TEMPLATES[med.stoppingReason.value].hi
+            : formatStateFallback(med.stoppingReason, "hi")
+        );
+      }
+      if (med.stoppedBy.state === "known" && med.stoppedBy.value) {
+        stopParts.push(STOPPED_BY_TEMPLATES[med.stoppedBy.value].hi);
+      }
+      lines.push(`दवाई बंद करने का विवरण: ${stopParts.join(" ")}`);
+    }
+
     if (med.expressions.length > 0) {
       for (const expr of med.expressions) {
         const plainMeaningHi = resolvePatientMeaning(
@@ -608,6 +663,79 @@ export function buildReadBackSummary(
           `आपके शब्द "${expr.originalPhrase}" का अर्थ: ${plainMeaningHi}।`
         );
       }
+    }
+  }
+
+  // Group unknown fields and not_mentioned fields into separate summary lines
+  const fieldDescriptors: {
+    state: FieldStateStatus;
+    en: string;
+    hi: string;
+  }[] = [
+    { state: med.dose.state, en: "dose", hi: "खुराक" },
+    {
+      state: med.durationTaken.state,
+      en: "how long you took it",
+      hi: "कितने समय तक ली",
+    },
+    {
+      state: med.onsetAfterStarting.state,
+      en: "when effects or side effects started",
+      hi: "असर या परेशानी कब शुरू हुई",
+    },
+    {
+      state: med.adherence.state,
+      en: "how you took it",
+      hi: "आपने दवाई कैसे ली",
+    },
+    {
+      state: med.effect.state,
+      en: "whether it helped",
+      hi: "दवाई से कितना आराम मिला",
+    },
+    {
+      state: med.sideEffects.state,
+      en: "side effects",
+      hi: "परेशानी या साइड इफेक्ट",
+    },
+    {
+      state: med.stoppingReason.state,
+      en: "why you stopped",
+      hi: "दवाई क्यों बंद की",
+    },
+    {
+      state: med.stoppedBy.state,
+      en: "who decided to stop it",
+      hi: "दवाई किसने बंद कराई",
+    },
+  ];
+
+  const unknownFields = fieldDescriptors.filter((f) => f.state === "unknown");
+  const notMentionedFields = fieldDescriptors.filter(
+    (f) => f.state === "not_mentioned"
+  );
+
+  if (unknownFields.length > 0) {
+    if (lang === "en") {
+      lines.push(
+        `You do not remember: ${unknownFields.map((f) => f.en).join(", ")}.`
+      );
+    } else {
+      lines.push(`आपको याद नहीं: ${unknownFields.map((f) => f.hi).join(", ")}।`);
+    }
+  }
+
+  if (notMentionedFields.length > 0) {
+    if (lang === "en") {
+      lines.push(
+        `Not discussed yet: ${notMentionedFields.map((f) => f.en).join(", ")}.`
+      );
+    } else {
+      lines.push(
+        `इनके बारे में आपने अभी कुछ नहीं बताया: ${notMentionedFields
+          .map((f) => f.hi)
+          .join(", ")}।`
+      );
     }
   }
 

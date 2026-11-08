@@ -39,7 +39,8 @@ const UI_LABELS = {
     doseLabel: "Dose",
     durationLabel: "Duration Taken",
     onsetLabel: "Onset After Starting",
-    doseTimingLabel: "Dose Timing / Schedule",
+    doseTimingLabel: "When you took the medicine",
+    symptomTimingLabel: "When the effect or side effect happened",
     adherenceLabel: "Adherence (Whether taken as prescribed)",
     effectLabel: "Effect (Whether it helped)",
     sideEffectsLabel: "Side Effects or Problems",
@@ -64,7 +65,8 @@ const UI_LABELS = {
     doseLabel: "खुराक (Dose)",
     durationLabel: "दवाई लेने की अवधि",
     onsetLabel: "शुरू करने के बाद असर का समय",
-    doseTimingLabel: "दवाई का दैनिक समय",
+    doseTimingLabel: "आप दवाई कब लेते थे",
+    symptomTimingLabel: "परेशानी कब होती थी",
     adherenceLabel: "आपने दवाई कैसे ली (Adherence)",
     effectLabel: "दवाई का असर (Effect)",
     sideEffectsLabel: "परेशानी या साइड इफेक्ट (Side Effects)",
@@ -232,8 +234,8 @@ export default function TimelinePage() {
                 </div>
               </div>
 
-              {/* Duration, Onset, Dose Timing */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm bg-gray-50 p-3 rounded border border-gray-200">
+              {/* Duration, Onset, Dose Timing, Symptom Timing */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm bg-gray-50 p-3 rounded border border-gray-200">
                 <div>
                   <div className="font-semibold text-gray-700">
                     {labels.durationLabel}
@@ -252,7 +254,16 @@ export default function TimelinePage() {
                   </div>
                   <div>
                     {med.doseTimingText ||
-                      (lang === "en" ? "Not mentioned" : "उल्लेख नहीं किया गया")}
+                      (lang === "en" ? "Not mentioned" : "ज़िक्र नहीं किया गया")}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-700">
+                    {labels.symptomTimingLabel}
+                  </div>
+                  <div>
+                    {med.symptomTimingText ||
+                      (lang === "en" ? "Not mentioned" : "ज़िक्र नहीं किया गया")}
                   </div>
                 </div>
               </div>

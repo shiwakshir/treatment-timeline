@@ -117,6 +117,9 @@ function InterviewContent() {
     StructuredFieldRecord<OnsetAfterStartingValue>
   >(emptyField());
   const [doseTimingText, setDoseTimingText] = useState<string | null>(null);
+  const [symptomTimingText, setSymptomTimingText] = useState<string | null>(
+    null
+  );
 
   const [confirmedExpressions, setConfirmedExpressions] = useState<
     TimelineExpressionView[]
@@ -235,6 +238,11 @@ function InterviewContent() {
           prev ? `${prev}; ${ext.doseTimingText}` : ext.doseTimingText
         );
       }
+      if (ext.symptomTimingText) {
+        setSymptomTimingText((prev) =>
+          prev ? `${prev}; ${ext.symptomTimingText}` : ext.symptomTimingText
+        );
+      }
 
       const mappedExprs: TimelineExpressionView[] = ext.expressions.map(
         (item, idx) => ({
@@ -300,6 +308,7 @@ function InterviewContent() {
     durationTaken: durationTakenField,
     onsetAfterStarting: onsetField,
     doseTimingText,
+    symptomTimingText,
     adherenceRaw,
     adherence: adherenceField,
     effectRaw,
@@ -329,6 +338,7 @@ function InterviewContent() {
           durationTaken: draftRecord.durationTaken,
           onsetAfterStarting: draftRecord.onsetAfterStarting,
           doseTimingText: draftRecord.doseTimingText,
+          symptomTimingText: draftRecord.symptomTimingText,
           adherenceRaw: draftRecord.adherenceRaw,
           adherence: draftRecord.adherence,
           effectRaw: draftRecord.effectRaw,

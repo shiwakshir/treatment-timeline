@@ -40,6 +40,7 @@ export async function GET() {
         durationTaken: parseFieldJson(m.durationTakenJson),
         onsetAfterStarting: parseFieldJson(m.onsetAfterStartingJson),
         doseTimingText: m.doseTimingText,
+        symptomTimingText: m.symptomTimingText,
         adherenceRaw: m.adherenceRaw,
         adherence: parseFieldJson(m.adherenceJson),
         effectRaw: m.effectRaw,

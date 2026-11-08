@@ -328,6 +328,30 @@ export interface ClassifierSimulationOptions {
   minGapMs?: number;
 }
 
+export function buildSafetyClassifierPrompt(answerText: string): string {
+  return `You are a clinical safety screening classifier for a mental health medication history tool.
+Analyze the patient's statement (written in Hindi, English, or Hinglish).
+
+Determine whether the statement indicates an URGENT crisis:
+1. "self_harm_or_suicide": Any active OR passive thoughts of suicide, wanting to die, wishing not to exist ("agar main na rahun toh kisi ko farak nahi padega"), feeling unable to go on and wanting everything to stop ("ab aur sahne ki taakat nahi bachi, bas sab ruk jaaye", "want everything to stop for good"), wanting not to wake up, ending one's life, self-harm, cutting, or taking an overdose / all pills at once.
+2. "severe_physical_reaction": Any medical emergency or life-threatening physical reaction such as inability to breathe, throat closing/swelling, anaphylaxis, crushing chest pain, seizure, or fainting/collapsing.
+3. "safe": Routine medication side effects (tiredness, sleepiness/falling asleep at work, headache/heavy head, dry mouth, insomnia, mild restlessness/ghabrahat without self-harm, weight gain, stomach upset, missed doses, cost issues) OR explicit negations where the patient clearly states they have NO thoughts of self-harm or dying ("marne ke khayal kabhi nahi aaye", "koi galat khayal nahi aata") OR figurative everyday idioms about deep sleep ("slept like a log").
+
+Err on the side of safety when genuine passive or active suicidal ideation or severe physical emergency is expressed.
+
+Return ONLY valid JSON matching this exact structure:
+{
+  "isUrgent": boolean,
+  "label": "safe" | "self_harm_or_suicide" | "severe_physical_reaction",
+  "reason": "short explanation"
+}
+
+Patient statement:
+"""
+${answerText}
+"""`;
+}
+
 /**
  * Runs the Gemini Flash-Lite safety classifier through the centralized request queue.
  */
@@ -365,27 +389,7 @@ export async function runSafetyClassifier(
 
       const ai = new GoogleGenAI({ apiKey });
 
-      const prompt = `You are a clinical safety screening classifier for a mental health medication history tool.
-Analyze the patient's statement (written in Hindi, English, or Hinglish).
-
-Determine whether the statement indicates an URGENT crisis:
-1. "self_harm_or_suicide": Any active OR passive thoughts of suicide, wanting to die, wishing not to exist ("agar main na rahun toh kisi ko farak nahi padega"), feeling unable to go on and wanting everything to stop ("ab aur sahne ki taakat nahi bachi, bas sab ruk jaaye", "want everything to stop for good"), wanting not to wake up, ending one's life, self-harm, cutting, or taking an overdose / all pills at once.
-2. "severe_physical_reaction": Any medical emergency or life-threatening physical reaction such as inability to breathe, throat closing/swelling, anaphylaxis, crushing chest pain, seizure, or fainting/collapsing.
-3. "safe": Routine medication side effects (tiredness, sleepiness/falling asleep at work, headache/heavy head, dry mouth, insomnia, mild restlessness/ghabrahat without self-harm, weight gain, stomach upset, missed doses, cost issues) OR explicit negations where the patient clearly states they have NO thoughts of self-harm or dying ("marne ke khayal kabhi nahi aaye", "koi galat khayal nahi aata") OR figurative everyday idioms about deep sleep ("slept like a log").
-
-Err on the side of safety when genuine passive or active suicidal ideation or severe physical emergency is expressed.
-
-Return ONLY valid JSON matching this exact structure:
-{
-  "isUrgent": boolean,
-  "label": "safe" | "self_harm_or_suicide" | "severe_physical_reaction",
-  "reason": "short explanation"
-}
-
-Patient statement:
-"""
-${answerText}
-"""`;
+      const prompt = buildSafetyClassifierPrompt(answerText);
 
       const response = await ai.models.generateContent({
         model: APP_CONFIG.models.safetyClassifier,

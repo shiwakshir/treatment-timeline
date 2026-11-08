@@ -9,6 +9,7 @@ dotenv.config();
 
 import { APP_CONFIG } from "../src/config/app-config";
 import {
+  buildSafetyClassifierPrompt,
   checkSafetyKeywords,
   evaluateAnswerSafety,
   SafetyDecisionStatus,
@@ -16,6 +17,7 @@ import {
 } from "../src/lib/safety";
 import {
   AdherenceValue,
+  buildExtractionPrompt,
   EffectValue,
   extractAnswerUnderstanding,
   ExtractionOutput,
@@ -58,6 +60,7 @@ interface EvalFixture {
     durationTaken: StructuredFieldFixture<string> | null;
     onsetAfterStarting: StructuredFieldFixture<OnsetAfterStartingValue> | null;
     doseTimingText: string | null;
+    symptomTimingText: string | null;
     expectedExpressions: ExpectedExpressionFixture[];
   };
 }
@@ -79,16 +82,31 @@ const FIXTURES_PATH = path.join(
   "eval-fixtures.json"
 );
 const CACHE_PATH = path.join(process.cwd(), "tests", ".eval-cache.json");
+const LEXICON_PATH = path.join(process.cwd(), "data", "lexicon.json");
+
+function sha256(text: string): string {
+  return crypto.createHash("sha256").update(text).digest("hex");
+}
 
 function computeFixtureHash(fixture: EvalFixture): string {
+  const safetyPromptSha256 = sha256(
+    buildSafetyClassifierPrompt(fixture.answerText)
+  );
+  const extractionPromptSha256 = sha256(
+    buildExtractionPrompt(fixture.answerText, fixture.questionCategory)
+  );
+  const lexiconSha256 = sha256(fs.readFileSync(LEXICON_PATH, "utf-8"));
+
   const payload = JSON.stringify({
     answerText: fixture.answerText,
     questionCategory: fixture.questionCategory,
     simulateClassifierFailure: fixture.simulateClassifierFailure,
     models: APP_CONFIG.models,
-    schemaVersion: "v4-unified-field-objects-no-freetext-readback",
+    safetyPromptSha256,
+    extractionPromptSha256,
+    lexiconSha256,
   });
-  return crypto.createHash("sha256").update(payload).digest("hex");
+  return sha256(payload);
 }
 
 function loadEvalCache(): EvalCacheMap {

@@ -51,6 +51,7 @@ async function main() {
         statedOptions: [],
       }),
       doseTimingText: null,
+      symptomTimingText: "din bhar",
       adherenceRaw:
         "Dose yaad nahi, shayad 50 thi ya 100, teen-chaar mahine li thi.",
       adherenceJson: JSON.stringify({
@@ -125,7 +126,8 @@ async function main() {
         value: "days_to_weeks",
         statedOptions: [],
       }),
-      doseTimingText: "shaam ko / raat ko",
+      doseTimingText: "subah nashta ke baad",
+      symptomTimingText: "shaam ko / raat ko",
       adherenceRaw:
         "Roz subah nashta ke baad ek goli leta tha, kabhi Sunday ko chhoot jaati thi.",
       adherenceJson: JSON.stringify({
@@ -239,7 +241,8 @@ async function main() {
         value: null,
         statedOptions: [],
       }),
-      doseTimingText: "सुबह उठने के बाद पूरा दिन",
+      doseTimingText: "रोज़ सुबह",
+      symptomTimingText: "सुबह उठने के बाद पूरा दिन",
       adherenceRaw: "मैंने डॉक्टर के बताए अनुसार रोज़ सुबह एक गोली ली थी।",
       adherenceJson: JSON.stringify({
         state: "known",
@@ -336,7 +339,8 @@ async function main() {
         value: null,
         statedOptions: [],
       }),
-      doseTimingText: "गोली खाने के एक घंटे बाद",
+      doseTimingText: "रात को सोने से पहले",
+      symptomTimingText: "गोली खाने के एक घंटे बाद",
       adherenceRaw: "रात को सोने से पहले लेती थी।",
       adherenceJson: JSON.stringify({
         state: "known",
@@ -432,7 +436,8 @@ async function main() {
         value: "days_to_weeks",
         statedOptions: [],
       }),
-      doseTimingText: "every night after dinner / next morning",
+      doseTimingText: "every night after dinner",
+      symptomTimingText: "next morning",
       adherenceRaw:
         "I took one tablet every night after dinner as told, though I missed two or three Sundays when travelling.",
       adherenceJson: JSON.stringify({

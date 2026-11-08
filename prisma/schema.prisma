@@ -36,6 +36,7 @@ model MedicationPeriod {
   durationTakenJson      String
   onsetAfterStartingJson String
   doseTimingText         String?
+  symptomTimingText      String?
 
   adherenceRaw           String
   adherenceJson          String
